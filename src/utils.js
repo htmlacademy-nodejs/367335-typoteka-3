@@ -52,11 +52,12 @@ const getRandomItem = (someArray) => someArray[getRandomIndex(someArray)];
  * Заверщает процесс с переданным кодом, выводя переданный текст
  *
  * @param {String} text
- * @param {string} [exitKey=`ERROR`]
+ * @param {Number} [exitCode=0]
  */
-const exitWithLog = (text, exitKey = `ERROR`) => {
-  console[(exitKey === `ERROR`) ? `error` : `info`](text);
-  process.exit(ExitCode[exitKey] || ExitCode.ERROR);
+const exitWithLog = (text, exitCode = ExitCode.ERROR) => {
+  const logMethod = (exitCode === ExitCode.ERROR) ? `error` : `info`;
+  console[logMethod](text);
+  process.exit(exitCode);
 };
 
 module.exports = {

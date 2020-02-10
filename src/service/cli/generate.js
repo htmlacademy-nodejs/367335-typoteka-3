@@ -1,5 +1,6 @@
 'use strict';
 
+const {ExitCode} = require(`../../constants`);
 const {exitWithLog, getRandomInt, getRandomIndex, getRandomItem, shuffle} = require(`../../utils`);
 const {writeFile} = require(`fs`);
 const moment = require(`moment`);
@@ -92,7 +93,7 @@ module.exports = {
         exitWithLog(`Ошибка записи данных в файл...`);
       }
 
-      exitWithLog(`Операция прошла успешно. Файл создан, записей - ${count}.`, `SUCCESS`);
+      exitWithLog(`Операция прошла успешно. Файл создан, записей - ${count}.`, ExitCode.SUCCESS);
     });
   }
 };
