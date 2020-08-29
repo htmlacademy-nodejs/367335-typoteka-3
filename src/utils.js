@@ -1,9 +1,10 @@
 'use strict';
 
 const {ExitCode} = require(`./constants`);
+const {green, red} = require(`chalk`);
 
 /**
- * Перетасовка массива по алгоритму Фишера—Йетса.
+ * Перемешивает массив по алгоритму Фишера—Йетса.
  *
  * @param {Array} array
  * @return {Array}
@@ -19,8 +20,7 @@ const shuffle = (array) => {
 };
 
 /**
- * Возвращает случайное число в диапазоне
- * `min` и `max`.
+ * Возвращает случайное число в диапазоне `min` и `max`.
  *
  * @param {Number} min
  * @param {Number} max
@@ -49,14 +49,16 @@ const getRandomIndex = (someArray) => getRandomInt(0, someArray.length - 1);
 const getRandomItem = (someArray) => someArray[getRandomIndex(someArray)];
 
 /**
- * Заверщает процесс с переданным кодом, выводя переданный текст
+ * Завершает процесс с переданным кодом, выводя переданный текст
+ * В случае успеха цвет текста зеленый, в случае ошибки - красный
  *
  * @param {String} text
  * @param {Number} [exitCode=0]
  */
 const exitWithLog = (text, exitCode = ExitCode.ERROR) => {
   const logMethod = (exitCode === ExitCode.ERROR) ? `error` : `info`;
-  console[logMethod](text);
+  const logToner = (exitCode === ExitCode.ERROR) ? red : green;
+  console[logMethod](logToner(text));
   process.exit(exitCode);
 };
 

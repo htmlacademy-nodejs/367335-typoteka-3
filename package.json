@@ -23,6 +23,7 @@
     "eslint-config-htmlacademy": "0.5.2"
   },
   "dependencies": {
+    "chalk": "4.1.0",
     "moment": "2.24.0"
   }
 }
