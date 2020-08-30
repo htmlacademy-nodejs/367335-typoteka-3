@@ -1,5 +1,6 @@
 'use strict';
 
+const {ExitCode} = require(`../../constants`);
 const {getRandomInt, getRandomIndex, getRandomItem, outputRes, shuffle} = require(`../../utils`);
 const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
@@ -85,6 +86,7 @@ module.exports = {
 
     if (count > PostsRestrict.MAX) {
       outputRes(`Не больше ${PostsRestrict.MAX} публикаций`, `ERROR`);
+      process.exit(ExitCode.ERROR);
     }
 
     try {
