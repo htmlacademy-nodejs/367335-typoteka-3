@@ -1,6 +1,6 @@
 'use strict';
 
-const {gray} = require(`chalk`);
+const {outputRes} = require(`../../utils`);
 
 const HELP_CONTENT = `
 Программа запускает http-сервер и формирует файл с данными для API.
@@ -16,6 +16,6 @@ const HELP_CONTENT = `
 module.exports = {
   name: `--help`,
   run() {
-    console.info(gray(HELP_CONTENT));
+    outputRes(HELP_CONTENT, `HELP`);
   }
 };

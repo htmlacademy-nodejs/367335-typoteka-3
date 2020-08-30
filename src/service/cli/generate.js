@@ -1,7 +1,6 @@
 'use strict';
 
-const {ExitCode} = require(`../../constants`);
-const {exitWithLog, getRandomInt, getRandomIndex, getRandomItem, shuffle} = require(`../../utils`);
+const {getRandomInt, getRandomIndex, getRandomItem, outputRes, shuffle} = require(`../../utils`);
 const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
 
@@ -85,14 +84,14 @@ module.exports = {
     const count = +countStr || PostsRestrict.MIN;
 
     if (count > PostsRestrict.MAX) {
-      exitWithLog(`Не больше ${PostsRestrict.MAX} публикаций`);
+      outputRes(`Не больше ${PostsRestrict.MAX} публикаций`, `ERROR`);
     }
 
     try {
       await writeFile(FILE_NAME, JSON.stringify(generatePosts(count)));
-      exitWithLog(`Операция прошла успешно. Файл создан, записей - ${count}.`, ExitCode.SUCCESS);
+      outputRes(`Операция прошла успешно. Файл создан, записей - ${count}.`, `SUCCESS`);
     } catch (err) {
-      exitWithLog(`Ошибка записи данных в файл...`);
+      outputRes(`Ошибка записи данных в файл...`, `ERROR`);
     }
   }
 };

@@ -1,7 +1,7 @@
 'use strict';
 
-const {ExitCode} = require(`./constants`);
-const {green, red} = require(`chalk`);
+const {ExitCode, LogMode} = require(`./constants`);
+const chalk = require(`chalk`);
 
 /**
  * Перемешивает массив по алгоритму Фишера—Йетса.
@@ -49,23 +49,24 @@ const getRandomIndex = (someArray) => getRandomInt(0, someArray.length - 1);
 const getRandomItem = (someArray) => someArray[getRandomIndex(someArray)];
 
 /**
- * Завершает процесс с переданным кодом, выводя переданный текст
- * В случае успеха цвет текста зеленый, в случае ошибки - красный
+ * Выводит результат в консоль в зависимости от режима из справочника `LogMode`
+ * Завершает процесс, если режим связан с существующим кодом выхода
  *
- * @param {String} text
- * @param {Number} [exitCode=0]
+ * @param {*} res
+ * @param {String} [modeName=`DEFAULT`]
  */
-const exitWithLog = (text, exitCode = ExitCode.ERROR) => {
-  const logMethod = (exitCode === ExitCode.ERROR) ? `error` : `info`;
-  const logToner = (exitCode === ExitCode.ERROR) ? red : green;
-  console[logMethod](logToner(text));
-  process.exit(exitCode);
+const outputRes = (res, modeName = `DEFAULT`) => {
+  const {method, color, exitCode} = LogMode[modeName];
+  console[method](chalk[color](res));
+  if (ExitCode[exitCode]) {
+    process.exit(ExitCode[exitCode]);
+  }
 };
 
 module.exports = {
-  exitWithLog,
   getRandomIndex,
   getRandomInt,
   getRandomItem,
+  outputRes,
   shuffle
 };
