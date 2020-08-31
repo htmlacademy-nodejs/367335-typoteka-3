@@ -2,22 +2,7 @@
 
 const {LogMode} = require(`./constants`);
 const chalk = require(`chalk`);
-
-/**
- * Перемешивает массив по алгоритму Фишера—Йетса.
- *
- * @param {Array} array
- * @return {Array}
- */
-const shuffle = (array) => {
-  const resultArray = array.slice();
-  for (let i = resultArray.length - 1; i > 0; i--) {
-    const randomNumber = Math.floor(Math.random() * (i + 1));
-    [resultArray[randomNumber], resultArray[i]] = [resultArray[i], resultArray[randomNumber]];
-  }
-
-  return resultArray;
-};
+const {readFile} = require(`fs`).promises;
 
 /**
  * Возвращает случайное число в диапазоне `min` и `max`.
@@ -59,10 +44,44 @@ const outputRes = (res, modeName = `DEFAULT`) => {
   console[method](chalk[color](res));
 };
 
+/**
+ * Возврашает массив строк файла
+ * Пустые строки и строки из одних пробельных символов игнорируются
+ *
+ * @param {String} filePath
+ * @return {Array}
+ */
+const readContent = async (filePath) => {
+  try {
+    const content = await readFile(filePath, `utf8`);
+    return content.split(`\n`).filter((item) => item.trim());
+  } catch (err) {
+    outputRes(err, `ERROR`);
+    return [];
+  }
+};
+
+/**
+ * Перемешивает массив по алгоритму Фишера—Йетса.
+ *
+ * @param {Array} array
+ * @return {Array}
+ */
+const shuffle = (array) => {
+  const resultArray = array.slice();
+  for (let i = resultArray.length - 1; i > 0; i--) {
+    const randomNumber = Math.floor(Math.random() * (i + 1));
+    [resultArray[randomNumber], resultArray[i]] = [resultArray[i], resultArray[randomNumber]];
+  }
+
+  return resultArray;
+};
+
 module.exports = {
   getRandomIndex,
   getRandomInt,
   getRandomItem,
   outputRes,
+  readContent,
   shuffle
 };
