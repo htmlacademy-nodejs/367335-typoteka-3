@@ -1,8 +1,8 @@
 'use strict';
 
 const {ExitCode} = require(`../../constants`);
-const {exitWithLog, getRandomInt, getRandomIndex, getRandomItem, shuffle} = require(`../../utils`);
-const {writeFile} = require(`fs`);
+const {getRandomInt, getRandomIndex, getRandomItem, outputRes, shuffle} = require(`../../utils`);
+const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
 
 const TITLES = [
@@ -81,19 +81,19 @@ const generatePosts = (count) => (Array(count).fill({}).map(() => ({
 
 module.exports = {
   name: `--generate`,
-  run([countStr]) {
+  async run([countStr]) {
     const count = +countStr || PostsRestrict.MIN;
 
     if (count > PostsRestrict.MAX) {
-      exitWithLog(`Не больше ${PostsRestrict.MAX} публикаций`);
+      outputRes(`Не больше ${PostsRestrict.MAX} публикаций`, `ERROR`);
+      process.exit(ExitCode.ERROR);
     }
 
-    writeFile(FILE_NAME, JSON.stringify(generatePosts(count)), (err) => {
-      if (err) {
-        exitWithLog(`Ошибка записи данных в файл...`);
-      }
-
-      exitWithLog(`Операция прошла успешно. Файл создан, записей - ${count}.`, ExitCode.SUCCESS);
-    });
+    try {
+      await writeFile(FILE_NAME, JSON.stringify(generatePosts(count)));
+      outputRes(`Операция прошла успешно. Файл создан, записей - ${count}.`, `SUCCESS`);
+    } catch (err) {
+      outputRes(`Ошибка записи данных в файл...`, `ERROR`);
+    }
   }
 };
