@@ -1,6 +1,6 @@
 'use strict';
 
-const {ExitCode} = require(`../../constants`);
+const {FILE_NAME, ExitCode} = require(`../../constants`);
 const {getRandomInt, getRandomIndex, getRandomItem, outputRes, readContent, shuffle} = require(`../../utils`);
 const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
@@ -15,7 +15,6 @@ const AnnounceRestrinct = {
   MAX: 5
 };
 
-const FILE_NAME = `mocks.json`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
