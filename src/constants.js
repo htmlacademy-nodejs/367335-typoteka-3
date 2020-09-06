@@ -1,26 +1,5 @@
 'use strict';
 
-const Services = {
-  ARTICLES: {
-    alias: `articles`
-  },
-  CATEGORIES: {
-    alias: `categories`
-  },
-  LOGIN: {
-    alias: `login`
-  },
-  MY: {
-    alias: `my`
-  },
-  REGISTER: {
-    alias: `register`
-  },
-  SEARCH: {
-    alias: `search`
-  }
-};
-
 module.exports = {
   DEFAULT_COMMAND: `--help`,
   DEFAULT_LOCAL_PORT: 3000,
@@ -62,7 +41,5 @@ module.exports = {
       method: `info`,
       exitCode: `SUCCESS`
     }
-  },
-  Services,
-  SERVICES_LIST: Object.keys(Services)
+  }
 };
