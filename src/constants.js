@@ -6,6 +6,7 @@ module.exports = {
   DEFAULT_PORT: 8080,
   FILE_NAME: `mocks.json`,
   NOT_FOUND_MSG: `Not found`,
+  PUBLIC_DIR: `public`,
   USER_ARGV_INDEX: 2,
   ExitCode: {
     ERROR: 1,
