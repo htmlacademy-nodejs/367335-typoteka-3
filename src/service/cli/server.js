@@ -1,6 +1,7 @@
 'use strict';
 
-const {DEFAULT_LOCAL_PORT, FILE_NAME, NOT_FOUND_MSG, HttpCode} = require(`../../constants`);
+const {StatusCodes, ReasonPhrases} = require(`http-status-codes`);
+const {DEFAULT_LOCAL_PORT, FILE_NAME} = require(`../../constants`);
 const {outputRes} = require(`../../utils`);
 const {readFile} = require(`fs`).promises;
 const express = require(`express`);
@@ -17,9 +18,7 @@ app.get(`/posts`, async (req, res) => {
   }
 });
 
-app.use((req, res) => res
-  .status(HttpCode.NOT_FOUND)
-  .send(NOT_FOUND_MSG));
+app.use((req, res) => res.status(StatusCodes.NOT_FOUND).send(ReasonPhrases.NOT_FOUND));
 
 module.exports = {
   name: `--server`,
