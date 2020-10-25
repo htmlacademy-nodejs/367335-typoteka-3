@@ -5,6 +5,14 @@ const chalk = require(`chalk`);
 const {readFile} = require(`fs`).promises;
 
 /**
+ * Делает первую букву строки заглавной
+ *
+ * @param {String} str
+ * @return {String}
+ */
+const capitalize = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
+
+/**
  * Возвращает случайное число в диапазоне `min` и `max`.
  *
  * @param {Number} min
@@ -94,6 +102,7 @@ const getRandomStrFromItems = ({
 }) => shuffle(list.slice()).slice(Restrict.MIN, Restrict.MAX).join(joiner);
 
 module.exports = {
+  capitalize,
   getRandomIndex,
   getRandomInt,
   getRandomItem,

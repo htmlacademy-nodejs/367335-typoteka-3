@@ -1,22 +1,15 @@
 'use strict';
 
 const {StatusCodes, ReasonPhrases} = require(`http-status-codes`);
-const {DEFAULT_LOCAL_PORT, FILE_NAME} = require(`../../constants`);
+const {DEFAULT_LOCAL_PORT} = require(`../../constants`);
 const {outputRes} = require(`../../utils`);
-const {readFile} = require(`fs`).promises;
 const express = require(`express`);
+const routes = require(`../api`);
 
 const app = express();
 app.use(express.json());
 
-app.get(`/posts`, async (req, res) => {
-  try {
-    const fileContent = await readFile(FILE_NAME);
-    res.json(JSON.parse(fileContent));
-  } catch (err) {
-    res.json([]);
-  }
-});
+app.use(`/api`, routes);
 
 app.use((req, res) => res.status(StatusCodes.NOT_FOUND).send(ReasonPhrases.NOT_FOUND));
 

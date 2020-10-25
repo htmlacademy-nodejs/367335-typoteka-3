@@ -27,7 +27,7 @@ const DATE_FORMAT = `YYYY-MM-DD HH:mm:ss`;
 const DELIMS = [` `, `\n`];
 
 const getRandomRestrict = (list, MIN = 0) => ({MIN, MAX: getRandomIndex(list) || DEFAULT_COUNT});
-const generateComments = (comments, count = getRandomRestrict(comments)) => {
+const generateComments = (comments, count = getRandomIndex(comments)) => {
   return Array(count).fill({}).map(() => ({
     id: nanoid(GENERATED_ID_LENGTH),
     text: getRandomStrFromItems({
@@ -53,7 +53,7 @@ const generatePosts = ({count, categories, comments, sentences, titles}) => (Arr
   category: getRandomStrFromItems({
     list: categories,
     Restrict: getRandomRestrict(categories),
-    joiner: getRandomItem(DELIMS)
+    joiner: DELIMS[1]
   }),
   comments: generateComments(comments)
 })));
