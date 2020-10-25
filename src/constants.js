@@ -5,6 +5,7 @@ module.exports = {
   DEFAULT_LOCAL_PORT: 3000,
   DEFAULT_PORT: 8080,
   FILE_NAME: `mocks.json`,
+  GENERATED_ID_LENGTH: 6,
   NOT_FOUND_MSG: `Not found`,
   PUBLIC_DIR: `public`,
   USER_ARGV_INDEX: 2,

@@ -1,34 +1,61 @@
 'use strict';
 
-const {FILE_NAME, ExitCode} = require(`../../constants`);
-const {getRandomInt, getRandomIndex, getRandomItem, outputRes, readContent, shuffle} = require(`../../utils`);
+const {FILE_NAME, GENERATED_ID_LENGTH, ExitCode} = require(`../../constants`);
+const {getRandomInt, getRandomIndex, getRandomItem, getRandomStrFromItems, outputRes, readContent} = require(`../../utils`);
 const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
+const {nanoid} = require(`nanoid`);
 
+const DEFAULT_COUNT = 1;
 const PostsRestrict = {
   MIN: 1,
   MAX: 1000
 };
-
-const AnnounceRestrinct = {
+const AnnounceRestrict = {
   MIN: 1,
   MAX: 5
 };
-
-const FILE_CATEGORIES_PATH = `./data/categories.txt`;
-const FILE_SENTENCES_PATH = `./data/sentences.txt`;
-const FILE_TITLES_PATH = `./data/titles.txt`;
+const DataFilePath = {
+  CATEGORIES: `./data/categories.txt`,
+  COMMENTS: `./data/comments.txt`,
+  SENTENCES: `./data/sentences.txt`,
+  TITLES: `./data/titles.txt`
+};
 const DATE_SUBTRACT_ENTITY = `days`;
 const DATE_SUBTRACT_MAX = 90;
 const DATE_FORMAT = `YYYY-MM-DD HH:mm:ss`;
-const SENTENCE_DELIMS = [` `, `\n`];
+const DELIMS = [` `, `\n`];
 
-const generatePosts = ({count, categories, sentences, titles}) => (Array(count).fill({}).map(() => ({
+const getRandomRestrict = (list, MIN = 0) => ({MIN, MAX: getRandomIndex(list) || DEFAULT_COUNT});
+const generateComments = (comments, count = getRandomRestrict(comments)) => {
+  return Array(count).fill({}).map(() => ({
+    id: nanoid(GENERATED_ID_LENGTH),
+    text: getRandomStrFromItems({
+      list: comments,
+      Restrict: {MIN: DEFAULT_COUNT, MAX: comments.length - 1}
+    })
+  }));
+};
+
+const generatePosts = ({count, categories, comments, sentences, titles}) => (Array(count).fill({}).map(() => ({
+  id: nanoid(GENERATED_ID_LENGTH),
   title: getRandomItem(titles),
-  announce: shuffle(sentences).slice(0, getRandomInt(AnnounceRestrinct.MIN + 1, AnnounceRestrinct.MAX)).join(SENTENCE_DELIMS[0]),
-  fullText: shuffle(sentences).slice(0, getRandomIndex(sentences)).join(getRandomItem(SENTENCE_DELIMS)),
+  announce: getRandomStrFromItems({
+    list: sentences,
+    Restrict: AnnounceRestrict
+  }),
+  fullText: getRandomStrFromItems({
+    list: sentences,
+    Restrict: getRandomRestrict(sentences),
+    joiner: getRandomItem(DELIMS)
+  }),
   createdDate: moment().subtract(getRandomInt(0, DATE_SUBTRACT_MAX), DATE_SUBTRACT_ENTITY).format(DATE_FORMAT),
-  category: shuffle(categories).slice(0, getRandomIndex(categories) || 1)
+  category: getRandomStrFromItems({
+    list: categories,
+    Restrict: getRandomRestrict(categories),
+    joiner: getRandomItem(DELIMS)
+  }),
+  comments: generateComments(comments)
 })));
 
 module.exports = {
@@ -41,10 +68,11 @@ module.exports = {
       process.exit(ExitCode.ERROR);
     }
 
-    const categories = await readContent(FILE_CATEGORIES_PATH);
-    const sentences = await readContent(FILE_SENTENCES_PATH);
-    const titles = await readContent(FILE_TITLES_PATH);
-    const content = generatePosts({count, categories, sentences, titles});
+    const categories = await readContent(DataFilePath.CATEGORIES);
+    const sentences = await readContent(DataFilePath.SENTENCES);
+    const titles = await readContent(DataFilePath.TITLES);
+    const comments = await readContent(DataFilePath.COMMENTS);
+    const content = generatePosts({count, categories, comments, sentences, titles});
 
     try {
       await writeFile(FILE_NAME, JSON.stringify(content));

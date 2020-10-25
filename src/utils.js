@@ -77,10 +77,27 @@ const shuffle = (array) => {
   return resultArray;
 };
 
+/**
+ * Возвращает строку из случайной последовательности элементов массива заданного размера, объединённую конкатенатором
+ *
+ * @param {*} {
+ *   list = [],
+ *   Restrict = {MIN: 0, MAX: 0},
+ *   joiner = ` `
+ * }
+ * @return {String}
+ */
+const getRandomStrFromItems = ({
+  list = [],
+  Restrict = {MIN: 0, MAX: 0},
+  joiner = ` `
+}) => shuffle(list.slice()).slice(Restrict.MIN, Restrict.MAX).join(joiner);
+
 module.exports = {
   getRandomIndex,
   getRandomInt,
   getRandomItem,
+  getRandomStrFromItems,
   outputRes,
   readContent,
   shuffle
