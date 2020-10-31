@@ -6,9 +6,8 @@ const itemExistsChecker = require(`../middlewares/item-exists-checker`);
 const itemValidator = require(`../middlewares/item-validator`);
 const keysToCheckArticle = [`title`, `announce`, `fullText`, `createdDate`, `category`];
 
-const route = new Router();
-
 module.exports = (app, articlesService, commentsService) => {
+  const route = new Router();
   app.use(`/articles`, route);
 
   route.get(`/`, (req, res) => {
