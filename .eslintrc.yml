@@ -10,3 +10,6 @@ ignorePatterns:
   '**/express/public/**/*.js'
 
 extends: 'htmlacademy/node'
+
+plugins:
+  - 'pug'
