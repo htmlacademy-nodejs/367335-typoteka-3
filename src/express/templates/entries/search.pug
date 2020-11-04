@@ -4,12 +4,20 @@ block constants
   - const bodyClass = `wrapper-color`
 
 block main
+  - const emptyFlag = query && !results.length
   main
     section.search-page
-      .search-page__wrapper
+      .search-page__wrapper(class=query && !results.length ? `search-page__wrapper--empty` : ``)
         h1 Поиск
         .search.search-page__form
-          form(action=`#`, method=`get`)
+          form(action=`/search`, method=`get`)
             label
-              input(type=`text`, placeholder=`Что ищем?`)
+              input(type=`text`, placeholder=`Что ищем?`, name=`query`, value=query)
             button.search__button.button.button--transparent(type=`submit`) Найти
+          each article in results
+            .search__result
+              time.search__date(datetime=article.date) #{article.outputDate}
+              a.search__link(href=`/articles/${article.id}`) !{article.title}
+        if query && !results.length
+          p.search-page__empty
+            | Ничего не нашлось

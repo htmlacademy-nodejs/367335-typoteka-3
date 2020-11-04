@@ -8,6 +8,7 @@ const articlesRouter = require(`./routes/articles`);
 const myRouter = require(`./routes/my`);
 const mainRouter = require(`./routes/main`);
 
+const UPLOAD_DIR = `upload`;
 const app = express();
 
 app.use(`/articles`, articlesRouter);
@@ -15,6 +16,7 @@ app.use(`/my`, myRouter);
 app.use(`/`, mainRouter);
 
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
+app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
 
 app.use((req, res) => res.status(StatusCodes.BAD_REQUEST).render(`400`));
 app.use((err, req, res, _next) => {
