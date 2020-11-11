@@ -1,14 +1,19 @@
 'use strict';
 
 const {Router} = require(`express`);
-const myRouter = new Router();
+const {getCommentsList, modifyArticle} = require(`../lib/articles`);
 
-myRouter.get(`/`, (req, res) => {
-  res.render(`my`);
+const myRouter = new Router();
+const api = require(`../api`).getAPI();
+
+myRouter.get(`/`, async (req, res) => {
+  const articles = await api.getArticles();
+  res.render(`my`, {articles: articles.map(modifyArticle)});
 });
 
-myRouter.get(`/comments`, (req, res) => {
-  res.render(`comments`);
+myRouter.get(`/comments`, async (req, res) => {
+  const articles = await api.getArticles();
+  res.render(`comments`, {comments: getCommentsList(articles.slice(0, 3))});
 });
 
 module.exports = myRouter;

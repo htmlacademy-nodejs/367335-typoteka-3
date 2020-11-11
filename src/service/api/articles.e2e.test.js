@@ -251,7 +251,7 @@ describe(`API correctly deletes an article`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns deleted article`, () => expect(response.body.id).toBe(`zE8SF6`));
-  test(`Article count is 4 now`, () => request(app).get(`/articles`).expect((res) => {
+  test(`Articles count is 4 now`, () => request(app).get(`/articles`).expect((res) => {
     expect(res.body.length).toBe(4);
   }));
 });
