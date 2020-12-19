@@ -1,7 +1,7 @@
 'use strict';
 
 const {FILE_NAME, GENERATED_ID_LENGTH, ExitCode} = require(`../../constants`);
-const {getRandomInt, getRandomIndex, getRandomItem, getRandomStrFromItems, outputRes, readContent} = require(`../../utils`);
+const {getRandomInt, getRandomIndex, getRandomItem, getRandomStrFromItems, outputRes, writeFileToArray} = require(`../../utils`);
 const {writeFile} = require(`fs`).promises;
 const moment = require(`moment`);
 const {nanoid} = require(`nanoid`);
@@ -68,10 +68,10 @@ module.exports = {
       process.exit(ExitCode.ERROR);
     }
 
-    const categories = await readContent(DataFilePath.CATEGORIES);
-    const sentences = await readContent(DataFilePath.SENTENCES);
-    const titles = await readContent(DataFilePath.TITLES);
-    const comments = await readContent(DataFilePath.COMMENTS);
+    const categories = await writeFileToArray(DataFilePath.CATEGORIES);
+    const sentences = await writeFileToArray(DataFilePath.SENTENCES);
+    const titles = await writeFileToArray(DataFilePath.TITLES);
+    const comments = await writeFileToArray(DataFilePath.COMMENTS);
     const content = generatePosts({count, categories, comments, sentences, titles});
 
     try {
