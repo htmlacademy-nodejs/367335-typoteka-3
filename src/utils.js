@@ -26,22 +26,6 @@ const getRandomInt = (min, max) => {
 };
 
 /**
- * Возвращает случайный индекс заданного массива
- *
- * @param {Array} someArray
- * @return {Number}
- */
-const getRandomIndex = (someArray) => getRandomInt(0, someArray.length - 1);
-
-/**
- * Возвращает случайный элемент заданного массива
- *
- * @param {Array} someArray
- * @return {*}
- */
-const getRandomItem = (someArray) => someArray[getRandomIndex(someArray)];
-
-/**
  * Выводит результат в консоль в зависимости от режима из справочника `LogMode`
  *
  * @param {*} res
@@ -85,28 +69,9 @@ const shuffle = (array) => {
   return resultArray;
 };
 
-/**
- * Возвращает строку из случайной последовательности элементов массива заданного размера, объединённую конкатенатором
- *
- * @param {*} {
- *   list = [],
- *   Restrict = {MIN: 0, MAX: 0},
- *   joiner = ` `
- * }
- * @return {String}
- */
-const getRandomStrFromItems = ({
-  list = [],
-  Restrict = {MIN: 0, MAX: 0},
-  joiner = ` `
-}) => shuffle(list.slice()).slice(Restrict.MIN, Restrict.MAX).join(joiner);
-
 module.exports = {
   capitalize,
-  getRandomIndex,
   getRandomInt,
-  getRandomItem,
-  getRandomStrFromItems,
   outputRes,
   writeFileToArray,
   shuffle
