@@ -1,7 +1,6 @@
 'use strict';
 
-const {GENERATED_ID_LENGTH} = require(`../../constants`);
-const {nanoid} = require(`nanoid`);
+const {getId} = require(`../lib/mock-utils`);
 
 class ArticlesService {
   constructor(articles) {
@@ -19,7 +18,7 @@ class ArticlesService {
 
   create(articleBody) {
     const newArticle = {
-      id: nanoid(GENERATED_ID_LENGTH),
+      id: getId(),
       ...articleBody
     };
     this._articles.push(newArticle);

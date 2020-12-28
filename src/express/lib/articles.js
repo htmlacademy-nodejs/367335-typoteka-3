@@ -2,11 +2,11 @@
 
 // Набор общих функций для работы с публикациями
 
-const moment = require(`moment`);
+const dayjs = require(`dayjs`);
 
 // Доработка одиночной публикации для шаблонизации
 const modifyArticle = (article, query = ``) => {
-  const createdDate = moment(article.createdDate);
+  const createdDate = dayjs(article.createdDate);
 
   article.fullTextParts = article.fullText.split(`\n`);
   article.date = createdDate.format(`YYYY-MM-DDTHH:mm`);
@@ -34,7 +34,7 @@ const getCommentsList = (articles) => articles.reduce((acc, article) => {
 
 // Обработка данных публикации для постинга
 const preprocessPostedArticle = ({body, file = {}}) => {
-  const date = body.date ? moment(body.date, `DD.MM.YYYY`) : moment();
+  const date = body.date ? dayjs(body.date, `DD.MM.YYYY`) : dayjs();
   const data = {
     title: body.title,
     announce: body.announce,

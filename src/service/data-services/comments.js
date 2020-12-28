@@ -1,7 +1,6 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {GENERATED_ID_LENGTH} = require(`../../constants`);
+const {getId} = require(`../lib/mock-utils`);
 
 class CommentsService {
   constructor() {
@@ -19,7 +18,7 @@ class CommentsService {
 
   create(article, comment) {
     const newComment = {
-      id: nanoid(GENERATED_ID_LENGTH),
+      id: getId(),
       ...comment
     };
     article.comments.push(newComment);
