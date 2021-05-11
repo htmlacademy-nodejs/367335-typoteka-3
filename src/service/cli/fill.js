@@ -1,9 +1,7 @@
 'use strict';
 
-const {
-  getRandomInt
-} = require(`../../utils`);
-
+const {FIRST_ID} = require(`../../constants`);
+const {getRandomInt} = require(`../../utils`);
 const {
   getFullText,
   getAnnounce,
@@ -18,7 +16,6 @@ const bcrypt = require(`bcrypt`);
 
 const MOCK_FILE_NAME = `fill-db.sql`;
 const SALT_ROUNDS = 10;
-const FIRST_ID = 1;
 const SHORT_TEXT_LIMIT = 250;
 const LONG_TEXT_LIMIT = 1000;
 
@@ -80,14 +77,14 @@ const generateArticles = (articlesCount, peoplesCount, sentences, titles) => {
 };
 
 const generateArticlesToCategories = (articlesCount, categoriesCount) => {
-  return Array(articlesCount).fill(1).reduce((acc, item, offerId) => {
+  return Array(articlesCount).fill(1).reduce((acc, item, articleId) => {
     const randomCount = getRandomInt(FIRST_ID, categoriesCount);
     const rows = Array(randomCount).fill(1).map(() => getRandomInt(FIRST_ID, categoriesCount));
 
     return [
       ...acc,
       ...(Array.from(new Set(rows))).map((categoryId) => [
-        offerId + 1,
+        articleId + 1,
         categoryId
       ])
     ];
@@ -97,12 +94,12 @@ const generateArticlesToCategories = (articlesCount, categoriesCount) => {
 const generateComments = (articlesCount, peoplesCount, comments) => {
   const {MIN, MAX} = CommentsRestrict;
 
-  return Array(articlesCount).fill(1).reduce((acc, item, offerId) => [
+  return Array(articlesCount).fill(1).reduce((acc, item, articleId) => [
     ...acc,
-    ...Array(getRandomInt(MIN, MAX)).fill(offerId).map(() => [
+    ...Array(getRandomInt(MIN, MAX)).fill(articleId).map(() => [
       `'${getCommentText(comments, CommentsRestrict, SHORT_TEXT_LIMIT)}'`,
       getRandomInt(FIRST_ID, peoplesCount),
-      offerId + 1
+      articleId + 1
     ])
   ], []);
 };

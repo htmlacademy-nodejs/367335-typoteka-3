@@ -41,6 +41,7 @@ CREATE TABLE articles (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+CREATE INDEX ON articles(title);
 
 CREATE TABLE articles_categories (
   article_id INTEGER NOT NULL,

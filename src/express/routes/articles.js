@@ -47,7 +47,9 @@ const renderNewPost = async (req, res) => {
 };
 
 articlesRouter.get(`/category/:id`, (req, res) => {
-  res.render(`articles-by-category`);
+  const {id} = req.params;
+  const article = api.getArticle(id, true);
+  res.render(`articles-by-category`, {article});
 });
 
 articlesRouter.get(`/add`, renderNewPost);
