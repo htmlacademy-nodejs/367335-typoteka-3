@@ -1,39 +1,46 @@
 'use strict';
 
-const {getId} = require(`../lib/mock-utils`);
+const Aliase = require(`../models/aliase`);
 
 class ArticlesService {
-  constructor(articles) {
-    this._articles = articles;
+  constructor({models}) {
+    this._Article = models.Article;
+    this._Comment = models.Comment;
+    this._Category = models.Category;
     this.entityName = `article`;
   }
 
-  findAll() {
-    return this._articles;
+  async findAll(needComments) {
+    const include = [Aliase.CATEGORIES];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
+    }
+    const articles = await this._Article.findAll({include});
+    return articles.map((item) => item.get());
   }
 
-  findOne(articleId) {
-    return this._articles.find((item) => item.id === articleId);
+  async findOne(articleId) {
+    return this._Article.findByPk(articleId, {include: Aliase.CATEGORIES});
   }
 
-  create(articleBody) {
-    const newArticle = {
-      id: getId(),
-      ...articleBody
-    };
-    this._articles.push(newArticle);
-    return newArticle;
+  async create(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.categories);
+    return article.get();
   }
 
-  update(articleId, articleBody) {
-    const oldArticle = this.findOne(articleId);
-    return Object.assign(oldArticle, articleBody);
+  async update(id, articleBody) {
+    const [affectedRows] = await this._Article.update(articleBody, {
+      where: {id}
+    });
+    return Boolean(affectedRows);
   }
 
-  drop(articleId) {
-    const deletedArticle = this.findOne(articleId);
-    this._articles = this._articles.filter((item) => item.id !== articleId);
-    return deletedArticle;
+  async drop(id) {
+    const deletedRows = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
   }
 }
 

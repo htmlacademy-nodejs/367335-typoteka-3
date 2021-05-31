@@ -6,11 +6,11 @@ const dayjs = require(`dayjs`);
 
 // Доработка одиночной публикации для шаблонизации
 const modifyArticle = (article, query = ``) => {
-  const createdDate = dayjs(article.createdDate);
+  const pubDate = dayjs(article.pubDate);
 
   article.fullTextParts = article.fullText.split(`\n`);
-  article.date = createdDate.format(`YYYY-MM-DDTHH:mm`);
-  article.outputDate = createdDate.format(`DD.MM.YYYY, HH:mm`);
+  article.date = pubDate.format(`YYYY-MM-DDTHH:mm`);
+  article.outputDate = pubDate.format(`DD.MM.YYYY, HH:mm`);
   article.categories = article.category.split(`\n`);
 
   if (query) {
@@ -39,7 +39,7 @@ const preprocessPostedArticle = ({body, file = {}}) => {
     title: body.title,
     announce: body.announce,
     fullText: body.text,
-    createdDate: date.format(`YYYY-MM-DD HH:mm:ss`),
+    pubDate: date.format(`YYYY-MM-DD HH:mm:ss`),
     comments: []
   };
   if (file.filename) {

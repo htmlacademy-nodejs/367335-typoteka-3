@@ -89,7 +89,7 @@ const getCommentText = (comments, {MIN = DEFAULT_COUNT}, limit = 0) => {
   });
 };
 
-const writeArticlesMockFile = async (countStr, generate, mockFileName = MOCK_FILE_NAME) => {
+const getDataFromDataFiles = async (countStr) => {
   const {MIN, MAX} = ArticlesRestrict;
   const articlesCount = Math.max(Number.parseInt(countStr, 10) || MIN, MIN);
 
@@ -105,11 +105,17 @@ const writeArticlesMockFile = async (countStr, generate, mockFileName = MOCK_FIL
     writeFileToArray(DataFilePath.TITLES),
     writeFileToArray(DataFilePath.PEOPLES)
   ]);
-  const content = generate({articlesCount, peoples, categories, comments, sentences, titles});
+
+  return {articlesCount, peoples, categories, comments, sentences, titles};
+};
+
+const writeArticlesMockFile = async (countStr, generate, mockFileName = MOCK_FILE_NAME) => {
+  const data = await getDataFromDataFiles(countStr);
+  const content = generate(data);
 
   try {
     await writeFile(mockFileName, content);
-    outputRes(`Operation success. File ${mockFileName} created. Articles - ${articlesCount}`, `SUCCESS`);
+    outputRes(`Operation success. File ${mockFileName} created. Articles - ${content.articlesCount}`, `SUCCESS`);
   } catch (err) {
     console.log(err);
     outputRes(`Can't write data to file...`, `ERROR`);
@@ -117,6 +123,7 @@ const writeArticlesMockFile = async (countStr, generate, mockFileName = MOCK_FIL
 };
 
 module.exports = {
+  getDataFromDataFiles,
   getAnnounce,
   getCategory,
   getCommentText,

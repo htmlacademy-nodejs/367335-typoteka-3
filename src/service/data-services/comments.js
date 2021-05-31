@@ -1,34 +1,37 @@
 'use strict';
 
-const {getId} = require(`../lib/mock-utils`);
-
 class CommentsService {
-  constructor() {
+  constructor({models}) {
     this.entityName = `comment`;
     this.parentEntityName = `article`;
+    this._Article = models.Article;
+    this._Comment = models.Comment;
   }
 
-  findAll(article) {
-    return article.comments;
+  findAll(articleId) {
+    return this._Comment.findAll({
+      where: {articleId},
+      raw: true
+    });
   }
 
-  findOne(article, commentId) {
-    return article.comments.find((item) => item.id === commentId);
+  findOne(commentId) {
+    return this._Comment.findByPk(commentId);
   }
 
-  create(article, comment) {
-    const newComment = {
-      id: getId(),
+  create(articleId, comment) {
+    return this._Comment.create({
+      articleId,
       ...comment
-    };
-    article.comments.push(newComment);
-    return newComment;
+    });
   }
 
-  drop(article, commentId) {
-    const dropComment = this.findOne(article, commentId);
-    article.comments = article.comments.filter((item) => item.id !== commentId);
-    return dropComment;
+  async drop(id) {
+    const deletedRows = await this._Comment.destroy({
+      where: {id}
+    });
+
+    return Boolean(deletedRows);
   }
 }
 
