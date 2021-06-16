@@ -20,6 +20,7 @@ app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
 
 app.use((req, res) => res.status(StatusCodes.BAD_REQUEST).render(`400`));
 app.use((err, req, res, _next) => {
+  console.error(err);
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).render(`500`);
 });
 

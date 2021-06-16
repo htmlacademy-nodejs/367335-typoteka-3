@@ -1,6 +1,14 @@
 'use strict';
 
-const {Aliase} = require(`../models/common`);
+const {Aliase: {CATEGORIES, COMMENTS}} = require(`../models/common`);
+
+const getInclude = (comments) => {
+  const include = [CATEGORIES];
+  if (Number(comments)) {
+    include.push(COMMENTS);
+  }
+  return include;
+};
 
 class ArticlesService {
   constructor({models}) {
@@ -10,17 +18,25 @@ class ArticlesService {
     this.entityName = `article`;
   }
 
-  async findAll(needComments) {
-    const include = [Aliase.CATEGORIES];
-    if (needComments) {
-      include.push(Aliase.COMMENTS);
-    }
-    const articles = await this._Article.findAll({include});
+  async findAll(comments) {
+    const articles = await this._Article.findAll({
+      include: getInclude(comments)
+    });
     return articles.map((item) => item.get());
   }
 
-  async findOne(articleId) {
-    return this._Article.findByPk(articleId, {include: Aliase.CATEGORIES});
+  async findPage({limit, offset, comments}) {
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include: getInclude(comments),
+      distinct: true
+    });
+    return {count, articles: rows};
+  }
+
+  async findOne({id, comments}) {
+    return this._Article.findByPk(id, {include: getInclude(comments)});
   }
 
   async create(articleData) {

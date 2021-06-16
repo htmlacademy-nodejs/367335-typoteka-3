@@ -14,7 +14,13 @@ module.exports = (service) => async ({params}, res, next) => {
   const [paramName, paramChildName = null] = Object.keys(params);
   const targetParamName = parentItem ? paramChildName : paramName;
   const id = params[targetParamName];
-  const item = await service.findOne(id);
+
+  const findOneParams = {id};
+  const {comments = 0} = params;
+  if (comments) {
+    findOneParams.comments = comments;
+  }
+  const item = await service.findOne(findOneParams);
 
   if (!item) {
     const reason = entityName

@@ -20,12 +20,12 @@ class API {
     return data;
   }
 
-  getArticles({comments}) {
-    return this._load(`/articles`, {params: {comments}});
+  getArticles({offset, limit, comments}) {
+    return this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
-  getArticle(id) {
-    return this._load(`/articles/${id}`);
+  getArticle({id, comments = 0}) {
+    return this._load(`/articles/${id}`, {params: {comments}});
   }
 
   search(query = ``) {

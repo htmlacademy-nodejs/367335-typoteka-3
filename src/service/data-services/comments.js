@@ -8,20 +8,20 @@ class CommentsService {
     this._Comment = models.Comment;
   }
 
-  findAll(articleId) {
+  findAll(ArticleId) {
     return this._Comment.findAll({
-      where: {articleId},
+      where: {ArticleId},
       raw: true
     });
   }
 
-  findOne(commentId) {
-    return this._Comment.findByPk(commentId);
+  findOne({id}) {
+    return this._Comment.findByPk(id);
   }
 
-  create(articleId, comment) {
+  create(ArticleId, comment) {
     return this._Comment.create({
-      articleId,
+      ArticleId,
       ...comment
     });
   }

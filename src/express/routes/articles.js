@@ -23,8 +23,10 @@ const upload = multer({
 });
 
 const renderCurrentPost = async (req, res, next) => {
+  const {id} = req.params;
+
   try {
-    const article = await api.getArticle(req.params.id);
+    const article = await api.getArticle({id});
     res.render(`post`, {article: modifyArticle(article)});
   } catch (err) {
     next();
@@ -48,7 +50,7 @@ const renderNewPost = async (req, res) => {
 
 articlesRouter.get(`/category/:id`, (req, res) => {
   const {id} = req.params;
-  const article = api.getArticle(id, true);
+  const article = api.getArticle({id, comments: 1});
   res.render(`articles-by-category`, {article});
 });
 

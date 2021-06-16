@@ -94,9 +94,9 @@ block main
         each article in articles
           li.preview__item(class=article.picture ? `` : `preview__item--noimage`)
             ul.preview__breadcrumbs
-              each category in article.categories
+              each category in article.Categories
                 li.preview__breadcrumbs-item
-                  a.preview__breadcrumbs-link(href=`#!`) #{category}
+                  a.preview__breadcrumbs-link(href=`#!`) #{category.title}
             if article.picture
               .preview__background
                 img.preview__background-image(src=`/img/${article.picture}` alt=article.title)
@@ -107,4 +107,8 @@ block main
             a.preview__comment(href=`#!`)
               | Комментарии
               span.preview__cloud
-              b.preview__comment-count  #{article.comments.length}
+              b.preview__comment-count  #{article.Comments.length}
+      if totalPages > 1
+        .preview__toggle-wrapper
+          +pagination(page, totalPages, 2, `?`)
+

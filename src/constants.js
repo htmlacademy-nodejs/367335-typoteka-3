@@ -7,6 +7,7 @@ module.exports = {
   FIRST_ID: 1,
   PUBLIC_DIR: `public`,
   USER_ARGV_INDEX: 2,
+  ARTICLES_PER_PAGE: 8,
   TextLength: {
     SHORT: 250,
     LONG: 1000
