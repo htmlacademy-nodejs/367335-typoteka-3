@@ -9,61 +9,66 @@ CREATE DATABASE typoteka
   TEMPLATE template0
   CONNECTION LIMIT = -1;
 
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS articles_categories;
-DROP TABLE IF EXISTS articles;
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS peoples;
+DROP TABLE IF EXISTS "Comments";
+DROP TABLE IF EXISTS "ArticleCategories";
+DROP TABLE IF EXISTS "Articles";
+DROP TABLE IF EXISTS "Categories";
+DROP TABLE IF EXISTS "People";
 
-CREATE TABLE peoples (
-	id SERIAL PRIMARY KEY,
-  first_name VARCHAR (100) NOT NULL,
-  last_name VARCHAR (100) NOT NULL,
-  email VARCHAR (100) NOT NULL UNIQUE,
-  password_hash CHAR (128) NOT NULL,
-  avatar VARCHAR (256) NOT NULL UNIQUE
+CREATE TABLE "People" (
+  "id" SERIAL PRIMARY KEY,
+  "firstName" VARCHAR (100) NOT NULL,
+  "lastName" VARCHAR (100) NOT NULL,
+  "email" VARCHAR (100) NOT NULL UNIQUE,
+  "passwordHash" CHAR (128) NOT NULL,
+  "avatar" VARCHAR (250) NOT NULL UNIQUE,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE categories (
-	id SMALLSERIAL PRIMARY KEY,
-  title VARCHAR (30) NOT NULL
+CREATE TABLE "Categories" (
+  "id" SMALLSERIAL PRIMARY KEY,
+  "title" VARCHAR (30) NOT NULL,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE articles (
-	id SERIAL PRIMARY KEY,
-  title VARCHAR (250) NOT NULL,
-  announce VARCHAR (250) NOT NULL,
-  full_text VARCHAR (1000),
-  picture VARCHAR (256),
-  pub_date date NOT NULL DEFAULT current_date,
-  people_id INTEGER NOT NULL,
-	FOREIGN KEY (people_id) REFERENCES peoples (id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+CREATE TABLE "Articles" (
+  "id" SERIAL PRIMARY KEY,
+  "title" VARCHAR (250) NOT NULL,
+  "announce" VARCHAR (250) NOT NULL,
+  "fullText" VARCHAR (1000),
+  "picture" VARCHAR (256),
+  "pubDate" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "PersonId" INTEGER NOT NULL,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY ("PersonId") REFERENCES "People" ("id")
+    ON DELETE CASCADE
 );
-CREATE INDEX ON articles(title);
+CREATE INDEX ON "Articles"(title);
 
-CREATE TABLE articles_categories (
-  article_id INTEGER NOT NULL,
-  category_id SMALLINT NOT NULL,
-	CONSTRAINT articles_categories_pk PRIMARY KEY (article_id, category_id),
-	FOREIGN KEY (article_id) REFERENCES articles (id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	FOREIGN KEY (category_id) REFERENCES categories (id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+CREATE TABLE "ArticleCategories" (
+  "ArticleId" INTEGER NOT NULL,
+  "CategoryId" SMALLINT NOT NULL,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT "ArticleCategories_pkey" PRIMARY KEY ("ArticleId", "CategoryId"),
+  FOREIGN KEY ("ArticleId") REFERENCES "Articles" ("id")
+    ON DELETE CASCADE,
+  FOREIGN KEY ("CategoryId") REFERENCES "Categories" ("id")
+    ON DELETE CASCADE
 );
 
-CREATE TABLE comments (
-	id SERIAL PRIMARY KEY,
-  text VARCHAR (250) NOT NULL,
-  people_id INTEGER NOT NULL,
-  article_id INTEGER NOT NULL,
-	FOREIGN KEY (people_id) REFERENCES peoples (id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	FOREIGN KEY (article_id) REFERENCES articles (id)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+CREATE TABLE "Comments" (
+  "id" SERIAL PRIMARY KEY,
+  "text" VARCHAR (250) NOT NULL,
+  "PersonId" INTEGER NOT NULL,
+  "ArticleId" INTEGER NOT NULL,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY ("PersonId") REFERENCES "People" ("id")
+    ON DELETE CASCADE,
+  FOREIGN KEY ("ArticleId") REFERENCES "Articles" ("id")
+    ON DELETE CASCADE
 );

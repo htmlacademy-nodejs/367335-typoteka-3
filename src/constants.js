@@ -7,7 +7,10 @@ module.exports = {
   FIRST_ID: 1,
   PUBLIC_DIR: `public`,
   USER_ARGV_INDEX: 2,
-  MOCK_FILE_NAME: `mocks.json`,
+  TextLength: {
+    SHORT: 250,
+    LONG: 1000
+  },
   Env: {
     DEVELOPMENT: `development`,
     PRODUCTION: `production`

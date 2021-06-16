@@ -1,7 +1,7 @@
 'use strict';
 
 const Sequelize = require(`sequelize`);
-const Aliase = require(`../models/aliase`);
+const {Aliase} = require(`../models/common`);
 
 class CategoriesService {
   constructor({models}) {
@@ -15,7 +15,7 @@ class CategoriesService {
     }
 
     const result = await this._Category.findAll({
-      attributes: [`id`, `name`, [Sequelize.fn(`COUNT`, `*`), `count`]],
+      attributes: [`id`, `title`, [Sequelize.fn(`COUNT`, `*`), `count`]],
       group: [Sequelize.col(`Category.id`)],
       include: [{
         model: this._ArticleCategory,

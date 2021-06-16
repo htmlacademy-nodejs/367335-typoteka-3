@@ -1,6 +1,6 @@
 'use strict';
 
-const Aliase = require(`../models/aliase`);
+const {Aliase} = require(`../models/common`);
 
 class ArticlesService {
   constructor({models}) {
