@@ -110,5 +110,5 @@ block main
               b.preview__comment-count  #{article.Comments.length}
       if totalPages > 1
         .preview__toggle-wrapper
-          +pagination(page, totalPages, 2, `?`)
+          +pagination(page, totalPages, 2, `?`, `preview__pagination`)
 

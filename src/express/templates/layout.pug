@@ -17,7 +17,7 @@ html(lang=`ru`)
       }
   body(style=bodyStyle)
 
-    mixin pagination(page, totalPages, width, prefix)
+    mixin pagination(page, totalPages, width, prefix, mixClass=null)
       -
         let start = page - width;
         let end = page + width;
@@ -34,7 +34,7 @@ html(lang=`ru`)
         }
         let i = start - 1
 
-      ul.pagination
+      ul.pagination(class=mixClass)
         li
           a.pagination__button.button.button--backwards(class={'button--disabled': page === 1}, href=(page > 1 ? `${prefix}page=${page - 1}` : null), aria-label='Страница назад')
         while i++ < end
