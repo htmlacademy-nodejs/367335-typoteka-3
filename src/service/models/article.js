@@ -1,32 +1,28 @@
 'use strict';
 
-const {DataTypes} = require(`sequelize`);
-const setVarchar = DataTypes.STRING;
+const {TextLength: {SHORT, LONG}} = require(`../../constants`);
+const {DATE, NOW, setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`Article`, {
   title: {
-    type: setVarchar(250),
+    type: setVarchar(SHORT),
     allowNull: false
   },
   announce: {
-    type: setVarchar(250),
+    type: setVarchar(SHORT),
     allowNull: false
   },
   fullText: {
-    type: setVarchar(1000)
+    type: setVarchar(LONG)
   },
   picture: {
-    type: setVarchar(256)
+    type: setVarchar(SHORT)
   },
   pubDate: {
-    type: DataTypes.DATE,
+    type: DATE,
     allowNull: false,
-    defaultValue: DataTypes.NOW
+    defaultValue: NOW
   }
-}, {
-  sequelize,
-  modelName: `Article`,
-  tableName: `articles`
 });
 
 module.exports = define;

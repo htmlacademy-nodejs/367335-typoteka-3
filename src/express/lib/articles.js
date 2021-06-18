@@ -11,7 +11,6 @@ const modifyArticle = (article, query = ``) => {
   article.fullTextParts = article.fullText.split(`\n`);
   article.date = pubDate.format(`YYYY-MM-DDTHH:mm`);
   article.outputDate = pubDate.format(`DD.MM.YYYY, HH:mm`);
-  article.categories = article.category.split(`\n`);
 
   if (query) {
     article.title = article.title.replace(query, `<b>${query}</b>`);
@@ -22,7 +21,7 @@ const modifyArticle = (article, query = ``) => {
 
 // Получение "плоского" списка комментариев из списка статей
 const getCommentsList = (articles) => articles.reduce((acc, article) => {
-  article.comments.forEach((comment) => {
+  article.Comments.forEach((comment) => {
     acc.push({
       ...comment,
       articleId: article.id,
@@ -40,7 +39,7 @@ const preprocessPostedArticle = ({body, file = {}}) => {
     announce: body.announce,
     fullText: body.text,
     pubDate: date.format(`YYYY-MM-DD HH:mm:ss`),
-    comments: []
+    Comments: []
   };
   if (file.filename) {
     data.picture = file.filename;

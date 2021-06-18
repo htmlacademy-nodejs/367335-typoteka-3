@@ -1,11 +1,10 @@
 'use strict';
 
-const {DataTypes} = require(`sequelize`);
-const setVarchar = DataTypes.STRING;
+const {SMALLINT, setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`Category`, {
   id: {
-    type: DataTypes.SMALLINT,
+    type: SMALLINT,
     primaryKey: true,
     autoIncrement: true
   },
@@ -13,10 +12,6 @@ const define = (sequelize) => sequelize.define(`Category`, {
     type: setVarchar(30),
     allowNull: false
   }
-}, {
-  sequelize,
-  modelName: `Category`,
-  tableName: `categories`
 });
 
 module.exports = define;

@@ -4,7 +4,7 @@
   "description": "Типотека",
   "main": "./src/service/service.js",
   "scripts": {
-    "dev": "nodemon ./src/express",
+    "dev": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon ./src/express",
     "eslint": "eslint --ext .js,.pug src/",
     "jest": "jest",
     "test::rest": "jest .e2e.test.js",

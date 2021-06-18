@@ -1,8 +1,7 @@
 'use strict';
 
-const {DataTypes} = require(`sequelize`);
-const setVarchar = DataTypes.STRING;
-const setChar = DataTypes.CHAR;
+const {TextLength: {SHORT}} = require(`../../constants`);
+const {setChar, setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`People`, {
   firstName: {
@@ -23,14 +22,10 @@ const define = (sequelize) => sequelize.define(`People`, {
     allowNull: false
   },
   avatar: {
-    type: setVarchar(256),
+    type: setVarchar(SHORT),
     allowNull: false,
     unique: true
   }
-}, {
-  sequelize,
-  modelName: `People`,
-  tableName: `peoples`
 });
 
 module.exports = define;

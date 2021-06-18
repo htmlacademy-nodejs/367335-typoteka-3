@@ -2,9 +2,9 @@
 
 const {nanoid} = require(`nanoid`);
 const dayjs = require(`dayjs`);
-const {writeFile} = require(`fs`).promises;
+const bcrypt = require(`bcrypt`);
 
-const {ExitCode, MOCK_FILE_NAME} = require(`../../constants`);
+const {ExitCode} = require(`../../constants`);
 const {getRandomInt, shuffle, outputRes, writeFileToArray} = require(`../../utils`);
 
 const DEFAULT_COUNT = 1;
@@ -13,23 +13,35 @@ const DELIMS = [` `, `\n`];
 const DEFAULT_DATE_ENTITY = `days`;
 const DEFAULT_DATE_SUBTRACT_MAX = 90;
 const DEFAULT_DATE_FORMAT = `YYYY-MM-DD HH:mm:ss`;
-
-const DataFilePath = {
-  CATEGORIES: `./data/categories.txt`,
-  COMMENTS: `./data/comments.txt`,
-  PEOPLES: `./data/peoples.txt`,
-  SENTENCES: `./data/sentences.txt`,
-  TITLES: `./data/titles.txt`
+const SALT_ROUNDS = 10;
+const EMAIL_DOMAINS = [`ru`, `com`, `net`, `academy`];
+const IMG_EXTENSIONS = [`jpg`, `png`];
+const EmailRestrict = {
+  MIN: 4,
+  MAX: 12
 };
-
+const PasswordRestrict = {
+  MIN: 6,
+  MAX: 12
+};
+const PictureRestrict = {
+  MIN: 3,
+  MAX: 16
+};
 const ArticlesRestrict = {
   MIN: 1,
   MAX: 1000
 };
-
 const AnnouncesRestrict = {
   MIN: 1,
   MAX: 5
+};
+const DataFilePath = {
+  CATEGORIES: `./data/categories.txt`,
+  COMMENTS: `./data/comments.txt`,
+  PEOPLE: `./data/people.txt`,
+  SENTENCES: `./data/sentences.txt`,
+  TITLES: `./data/titles.txt`
 };
 
 const getRandomIndex = (someArray) => getRandomInt(0, someArray.length - 1);
@@ -72,11 +84,7 @@ const getFullText = (sentences, limit = 0) => getRandomStrFromItems({
   limit
 });
 
-const getCategory = (categories) => getRandomStrFromItems({
-  list: categories,
-  Restrict: getRandomRestrict(categories),
-  joiner: DELIMS[1]
-});
+const getCategories = (categories) => shuffle(categories.slice()).slice(0, getRandomIndex(categories));
 
 const getCommentText = (comments, {MIN = DEFAULT_COUNT}, limit = 0) => {
   return getRandomStrFromItems({
@@ -98,39 +106,54 @@ const getDataFromDataFiles = async (countStr) => {
     process.exit(ExitCode.ERROR);
   }
 
-  const [categories, comments, sentences, titles, peoples] = await Promise.all([
+  const [categories, comments, sentences, titles, people] = await Promise.all([
     writeFileToArray(DataFilePath.CATEGORIES),
     writeFileToArray(DataFilePath.COMMENTS),
     writeFileToArray(DataFilePath.SENTENCES),
     writeFileToArray(DataFilePath.TITLES),
-    writeFileToArray(DataFilePath.PEOPLES)
+    writeFileToArray(DataFilePath.PEOPLE)
   ]);
 
-  return {articlesCount, peoples, categories, comments, sentences, titles};
+  return {articlesCount, people, categories, comments, sentences, titles};
 };
 
-const writeArticlesMockFile = async (countStr, generate, mockFileName = MOCK_FILE_NAME) => {
-  const data = await getDataFromDataFiles(countStr);
-  const content = generate(data);
-
-  try {
-    await writeFile(mockFileName, content);
-    outputRes(`Operation success. File ${mockFileName} created. Articles - ${content.articlesCount}`, `SUCCESS`);
-  } catch (err) {
-    console.log(err);
-    outputRes(`Can't write data to file...`, `ERROR`);
-  }
+const generatePicture = () => {
+  const imgLength = getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX);
+  return `${getId(imgLength).toLowerCase()}.${getRandomItem(IMG_EXTENSIONS)}`;
 };
+
+const generatePerson = (person) => {
+  const emailPrependLength = getRandomInt(EmailRestrict.MIN, EmailRestrict.MAX);
+  const emailAppendLength = getRandomInt(EmailRestrict.MIN, EmailRestrict.MAX);
+  const passwordLength = getRandomInt(PasswordRestrict.MIN, PasswordRestrict.MAX);
+  const [firstName, lastName] = person.split(` `);
+
+  return {
+    firstName,
+    lastName,
+    email: `${nanoid(emailPrependLength)}@${nanoid(emailAppendLength)}.${getRandomItem(EMAIL_DOMAINS)}`,
+    passwordHash: bcrypt.hashSync(nanoid(passwordLength), SALT_ROUNDS),
+    avatar: generatePicture()
+  };
+};
+
+const generateData = ({categories, articles, people}) => ({
+  categories: categories.map((item) => ({title: item})),
+  articles,
+  people: people.map(generatePerson)
+});
 
 module.exports = {
+  generateData,
+  generatePerson,
+  generatePicture,
   getDataFromDataFiles,
   getAnnounce,
-  getCategory,
+  getCategories,
   getCommentText,
   getId,
   getRandomDate,
   getRandomIndex,
   getRandomItem,
-  getFullText,
-  writeArticlesMockFile
+  getFullText
 };

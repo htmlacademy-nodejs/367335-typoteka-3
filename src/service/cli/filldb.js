@@ -1,21 +1,22 @@
 'use strict';
 
-const {ExitCode, FIRST_ID} = require(`../../constants`);
+const {ExitCode, TextLength, FIRST_ID} = require(`../../constants`);
 const {getRandomInt} = require(`../../utils`);
 const {
   getDataFromDataFiles,
   getAnnounce,
-  getCategory,
+  getCategories,
   getCommentText,
   getFullText,
   getRandomDate,
   getRandomIndex,
-  getRandomItem
+  getRandomItem,
+  generateData,
+  generatePicture
 } = require(`../lib/mock-utils`);
 
 const sequelize = require(`../lib/sequelize`);
 const initDB = require(`../lib/init-db`);
-const generateData = require(`../lib/generate-data`);
 const {getLogger} = require(`../lib/logger`);
 
 const logger = getLogger({name: `filldb`});
@@ -25,18 +26,19 @@ const exitWithError = (err) => {
   process.exit(ExitCode.ERROR);
 };
 
-const generatePosts = ({articlesCount, peoples, categories, comments, sentences, titles}) => {
+const generatePosts = ({articlesCount, people, categories, comments, sentences, titles}) => {
   return Array(articlesCount).fill({}).map(() => ({
     title: getRandomItem(titles),
-    announce: getAnnounce(sentences),
-    fullText: getFullText(sentences),
+    announce: getAnnounce(sentences, TextLength.SHORT),
+    fullText: getFullText(sentences, TextLength.LONG),
+    picture: generatePicture(),
     pubDate: getRandomDate(),
-    category: getCategory(categories),
-    comments: Array(getRandomIndex(comments)).fill({}).map(() => ({
-      text: getCommentText(comments, {}),
-      peopleId: getRandomInt(FIRST_ID, peoples.length)
+    categories: getCategories(categories),
+    Comments: Array(getRandomIndex(comments)).fill({}).map(() => ({
+      text: getCommentText(comments, {}, TextLength.SHORT),
+      PersonId: getRandomInt(FIRST_ID, people.length)
     })),
-    peopleId: getRandomInt(FIRST_ID, peoples.length)
+    PersonId: getRandomInt(FIRST_ID, people.length)
   }));
 };
 
@@ -58,7 +60,7 @@ module.exports = {
       comments,
       sentences,
       titles,
-      peoples
+      people
     } = await getDataFromDataFiles(countStr);
 
     try {
@@ -70,9 +72,9 @@ module.exports = {
           comments,
           sentences,
           titles,
-          peoples
+          people
         }),
-        peoples
+        people
       }));
     } catch (err) {
       exitWithError(err);
