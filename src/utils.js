@@ -69,7 +69,17 @@ const shuffle = (array) => {
   return resultArray;
 };
 
+/**
+ * Возвращает значение в виде массива
+ * Если значение массивом не является, оно оборачивается в массив
+ *
+ * @param {*} value
+ * @return {Array}
+ */
+const ensureArray = (value) => Array.isArray(value) ? value : [value];
+
 module.exports = {
+  ensureArray,
   capitalize,
   getRandomInt,
   outputRes,

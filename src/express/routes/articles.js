@@ -1,52 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const multer = require(`multer`);
-const path = require(`path`);
-const {nanoid} = require(`nanoid`);
-const {modifyArticle, preprocessPostedArticle} = require(`../lib/articles`);
-
-const UPLOAD_DIR = `../upload/img/`;
-const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
+const {StatusCodes} = require(`http-status-codes`);
+const {modifyArticle, sendArticle, renderPostForm} = require(`../lib/articles`);
+const upload = require(`../middlewares/upload`);
 const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: uploadDirAbsolute,
-    filename: (req, file, cb) => {
-      const uniqueName = nanoid(10);
-      const extension = file.originalname.split(`.`).pop();
-      cb(null, `${uniqueName}.${extension}`);
-    }
-  })
-});
-
-const renderCurrentPost = async (req, res, next) => {
-  const {id} = req.params;
-
-  try {
-    const article = await api.getArticle({id});
-    res.render(`post`, {article: modifyArticle(article)});
-  } catch (err) {
-    next();
-  }
-};
-
-const renderNewPost = async (req, res) => {
-  const categories = await api.getCategories();
-  const post = req.body || {};
-  res.render(`new-post`, {
-    categories,
-    post,
-    setChecked(category) {
-      if (!post.categories) {
-        return false;
-      }
-      return post.categories.indexOf(category) !== -1;
-    }
-  });
-};
 
 articlesRouter.get(`/category/:id`, (req, res) => {
   const {id} = req.params;
@@ -54,19 +13,45 @@ articlesRouter.get(`/category/:id`, (req, res) => {
   res.render(`articles-by-category`, {article});
 });
 
-articlesRouter.get(`/add`, renderNewPost);
+articlesRouter.get(`/add`, renderPostForm);
+articlesRouter.get(`/edit/:id`, renderPostForm);
 
-articlesRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
+articlesRouter.post(`/add`, upload.single(`picture`), sendArticle);
+articlesRouter.post(`/edit/:id`, upload.single(`picture`), sendArticle);
+
+articlesRouter.get(`/:id`, async (req, res, next) => {
+  const {payload = `{}`, errors = `{}`} = req.query;
+  const {id} = req.params;
+
   try {
-    await api.createArticle(preprocessPostedArticle(req));
-    res.redirect(`/my`);
+    const article = await api.getArticle({id, comments: 1});
+    res.render(`post`, {
+      article: modifyArticle(article),
+      payload: JSON.parse(payload),
+      errors: JSON.parse(errors)
+    });
   } catch (err) {
-    renderNewPost(req, res);
+    next();
   }
 });
 
-articlesRouter.get(`/:id`, renderCurrentPost);
+articlesRouter.post(`/:id`, async (req, res) => {
+  const {body, params: {id}} = req;
 
-articlesRouter.get(`/edit/:id`, renderCurrentPost);
+  try {
+    await api.createComment(id, {
+      ...body,
+      PersonId: 1 // временная заглушка для прохождения валидации
+    });
+    res.status(StatusCodes.CREATED).redirect(`/articles/${id}`);
+  } catch (err) {
+    // передаем ранее заполненные данные для пробрасывания в форму
+    const payloadStr = encodeURIComponent(JSON.stringify(body));
+
+    const errorStr = encodeURIComponent(JSON.stringify(err.response.data));
+
+    res.redirect(`/articles/${id}?payload=${payloadStr}&errors=${errorStr}`);
+  }
+});
 
 module.exports = articlesRouter;

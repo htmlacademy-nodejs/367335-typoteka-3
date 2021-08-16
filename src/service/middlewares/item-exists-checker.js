@@ -3,7 +3,7 @@
 const {capitalize} = require(`../../utils`);
 const {StatusCodes, ReasonPhrases} = require(`http-status-codes`);
 
-module.exports = (service) => async ({params}, res, next) => {
+module.exports = (service) => async ({params, query}, res, next) => {
   const entityName = service.entityName || service.parentEntityName;
   if (!service.findOne && !entityName) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -15,12 +15,10 @@ module.exports = (service) => async ({params}, res, next) => {
   const targetParamName = parentItem ? paramChildName : paramName;
   const id = params[targetParamName];
 
-  const findOneParams = {id};
-  const {comments = 0} = params;
-  if (comments) {
-    findOneParams.comments = comments;
-  }
-  const item = await service.findOne(findOneParams);
+  const item = await service.findOne({
+    id,
+    comments: Number(params.comments || query.comments)
+  });
 
   if (!item) {
     const reason = entityName
