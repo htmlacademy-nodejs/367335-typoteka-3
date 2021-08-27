@@ -110,12 +110,13 @@ const mockArticles = [
   }
 ];
 const sampleArticle = {
-  title: `Как начать программировать`,
-  announce: `Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Как начать действовать? Для начала просто соберитесь. Это один из лучших рок-музыкантов. Альбом стал настоящим открытием года. Мощные гитарные рифы и скоростные соло-партии не дадут заскучать.`,
+  title: `Как начать программировать, чтобы не было мучительно больно и смешно`,
+  announce: `Бороться с прокрастинацией несложно. Просто действуйте. Маленькими шагами. Как начать действовать? Для начала просто соберитесь. Альбом стал настоящим открытием года. Мощные гитарные рифы и скоростные соло-партии не дадут заскучать.`,
   fullText: `Ёлки — это не просто красивое дерево. Это прочная древесина. Достичь успеха помогут ежедневные повторения.`,
   pubDate: `2020-09-21 15:59:06`,
-  categories: [1, 2],
-  Comments: []
+  Categories: [1, 2],
+  picture: ``, // поле должно быть, но пустая строка валидна
+  PersonId: 1
 };
 const sampleKeys = Object.keys(sampleArticle);
 
@@ -179,14 +180,44 @@ describe(`API creates an article if data is valid`, () => {
 describe(`API refuses to create an article if data is invalid`, () => {
   const newArticle = JSON.parse(JSON.stringify(sampleArticle));
 
-  test(`Without any required property response code is 400`, async () => {
-    const app = await createAPI();
-    const badArticle = {...newArticle};
+  let app;
+  beforeAll(async () => {
+    app = await createAPI();
+  });
 
+  test(`Without any required property response code is 400`, async () => {
     for (const key of sampleKeys) {
+      const badArticle = {...newArticle};
       delete badArticle[key];
+      await request(app).post(`/articles`).send(badArticle).expect(StatusCodes.BAD_REQUEST);
     }
-    await request(app).post(`/articles`).send(badArticle).expect(StatusCodes.BAD_REQUEST);
+  });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, pubDate: true},
+      {...newArticle, title: 12345},
+      {...newArticle, categories: `Котики`}
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(StatusCodes.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, title: `too short`},
+      {...newArticle, categories: []}
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(StatusCodes.BAD_REQUEST);
+    }
   });
 });
 
@@ -203,16 +234,17 @@ describe(`API changes existent article`, () => {
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns changed article`, () => expect(response.body).toEqual(true));
   test(`Article is really changed`, () => request(app).get(`/articles/1`).expect((res) => {
-    expect(res.body.title).toBe(`Как начать программировать`);
+    expect(res.body.title).toBe(`Как начать программировать, чтобы не было мучительно больно и смешно`);
   }));
 });
 
 test(`API returns status code 404 when trying to change non-existent article`, async () => {
   const validArticle = {
-    title: `Это валидный`,
-    announce: `объект`,
-    fullText: `статьи`,
+    title: `Это валидный заголовок (длина не менее 30 символов)`,
+    announce: `и валидный анонс (длина не менее 30 символов)`,
+    fullText: `валидной статьи (длина текста не менее 30 символов)`,
     pubDate: `2020-09-21 15:59:06`,
+    picture: `passed-name.jpg`,
     categories: [1]
   };
   const app = await createAPI();
@@ -269,7 +301,8 @@ describe(`API returns a list of comments to given article`, () => {
 
 describe(`API creates a comment if data is valid`, () => {
   const newComment = {
-    text: `Валидному комментарию достаточно этого поля`
+    text: `Валидному комментарию достаточно этого поля`,
+    PersonId: 1
   };
   let app;
   let response;

@@ -88,27 +88,27 @@ block main
             a.last__list-link(href=`#!`)
               | Что-то все электрокары в последнее время все на одно лицо
               | делаются))
-    section.main-page__list.preview
-      h2.visually-hidden Список превью статей
-      ul.preview__list
-        each article in articles
-          li.preview__item(class=article.picture ? `` : `preview__item--noimage`)
-            ul.preview__breadcrumbs
-              each category in article.Categories
-                li.preview__breadcrumbs-item
-                  a.preview__breadcrumbs-link(href=`#!`) #{category.title}
-            if article.picture
-              .preview__background
-                img.preview__background-image(src=`/img/${article.picture}` alt=article.title)
-            time.preview__time(datetime=article.date) #{article.outputDate}
-            h3.preview__name
-              a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
-            p.preview__text #{article.announce}
-            a.preview__comment(href=`#!`)
-              | Комментарии
-              span.preview__cloud
-              b.preview__comment-count  #{article.Comments.length}
-      if totalPages > 1
-        .preview__toggle-wrapper
-          +pagination(page, totalPages, 2, `?`, `preview__pagination`)
-
+    if articles.length
+      section.main-page__list.preview
+        h2.visually-hidden Список превью статей
+        ul.preview__list
+          each article in articles
+            li.preview__item(class=article.picture ? `` : `preview__item--noimage`)
+              ul.preview__breadcrumbs
+                each category in article.Categories
+                  li.preview__breadcrumbs-item
+                    a.preview__breadcrumbs-link(href=`#!`) #{category.title}
+              if article.picture
+                .preview__background
+                  img.preview__background-image(src=`/img/${article.picture}` alt=article.title)
+              time.preview__time(datetime=article.date) #{article.outputDate}
+              h3.preview__name
+                a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
+              p.preview__text #{article.announce}
+              a.preview__comment(href=`#!`)
+                | Комментарии
+                span.preview__cloud
+                b.preview__comment-count  #{article.Comments.length}
+        if totalPages > 1
+          .preview__toggle-wrapper
+            +pagination(page, totalPages, 2, `?`, `preview__pagination`)

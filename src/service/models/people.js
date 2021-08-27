@@ -1,28 +1,28 @@
 'use strict';
 
-const {TextLength: {SHORT}} = require(`../../constants`);
+const {MaxValue} = require(`../../constants`);
 const {setChar, setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`People`, {
   firstName: {
-    type: setVarchar(100),
+    type: setVarchar(MaxValue.FIRST_NAME),
     allowNull: false
   },
   lastName: {
-    type: setVarchar(100),
+    type: setVarchar(MaxValue.LAST_NAME),
     allowNull: false
   },
   email: {
-    type: setVarchar(100),
+    type: setVarchar(MaxValue.EMAIL),
     allowNull: false,
     unique: true
   },
   passwordHash: {
-    type: setChar(128),
+    type: setChar(MaxValue.PASSWORD),
     allowNull: false
   },
   avatar: {
-    type: setVarchar(SHORT),
+    type: setVarchar(MaxValue.FILENAME),
     allowNull: false,
     unique: true
   }

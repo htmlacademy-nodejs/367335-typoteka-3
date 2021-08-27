@@ -1,6 +1,6 @@
 'use strict';
 
-const {ExitCode, TextLength, FIRST_ID} = require(`../../constants`);
+const {ExitCode, FIRST_ID, MaxValue} = require(`../../constants`);
 const {getRandomInt} = require(`../../utils`);
 const {
   getDataFromDataFiles,
@@ -29,13 +29,13 @@ const exitWithError = (err) => {
 const generatePosts = ({articlesCount, people, categories, comments, sentences, titles}) => {
   return Array(articlesCount).fill({}).map(() => ({
     title: getRandomItem(titles),
-    announce: getAnnounce(sentences, TextLength.SHORT),
-    fullText: getFullText(sentences, TextLength.LONG),
+    announce: getAnnounce(sentences, MaxValue.ANNOUNCE),
+    fullText: getFullText(sentences, MaxValue.TEXT),
     picture: generatePicture(),
     pubDate: getRandomDate(),
     categories: getCategories(categories),
     Comments: Array(getRandomIndex(comments)).fill({}).map(() => ({
-      text: getCommentText(comments, {}, TextLength.SHORT),
+      text: getCommentText(comments, {}, MaxValue.COMMENT),
       PersonId: getRandomInt(FIRST_ID, people.length)
     })),
     PersonId: getRandomInt(FIRST_ID, people.length)

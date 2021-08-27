@@ -18,14 +18,14 @@ class ArticlesService {
     this.entityName = `article`;
   }
 
-  async findAll(comments) {
+  async findAll(comments = 0) {
     const articles = await this._Article.findAll({
       include: getInclude(comments)
     });
     return articles.map((item) => item.get());
   }
 
-  async findPage({limit, offset, comments}) {
+  async findPage({limit = 0, offset = 0, comments = 0}) {
     const {count, rows} = await this._Article.findAndCountAll({
       limit,
       offset,
@@ -35,8 +35,12 @@ class ArticlesService {
     return {count, articles: rows};
   }
 
-  async findOne({id, comments}) {
-    return this._Article.findByPk(id, {include: getInclude(comments)});
+  async findOne({id, comments = 0}) {
+    const article = await this._Article.findByPk(id, {include: getInclude(comments)});
+    if (article) {
+      return article.get({plain: true});
+    }
+    return article;
   }
 
   async create(articleData) {

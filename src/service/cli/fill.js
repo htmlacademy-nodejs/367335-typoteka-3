@@ -1,7 +1,7 @@
 'use strict';
 
 const {writeFile} = require(`fs`).promises;
-const {FIRST_ID, TextLength} = require(`../../constants`);
+const {FIRST_ID, MaxValue} = require(`../../constants`);
 const {getRandomInt, outputRes} = require(`../../utils`);
 const {
   generatePerson,
@@ -44,8 +44,8 @@ const generateCategories = (categories) => categories.map((category) => [
 const generateArticles = (articlesCount, peopleCount, sentences, titles) => {
   return Array(articlesCount).fill([]).map(() => [
     `'${getRandomItem(titles)}'`,
-    `'${getAnnounce(sentences, TextLength.SHORT)}'`,
-    `'${getFullText(sentences, TextLength.LONG)}'`,
+    `'${getAnnounce(sentences, MaxValue.ANNOUNCE)}'`,
+    `'${getFullText(sentences, MaxValue.TEXT)}'`,
     `'${generatePicture()}'`,
     `'${getRandomDate()}'`,
     `CURRENT_TIMESTAMP`,
@@ -77,7 +77,7 @@ const generateComments = (articlesCount, peopleCount, comments) => {
   return Array(articlesCount).fill(1).reduce((acc, item, articleId) => [
     ...acc,
     ...Array(getRandomInt(MIN, MAX)).fill(articleId).map(() => [
-      `'${getCommentText(comments, CommentsRestrict, TextLength.SHORT)}'`,
+      `'${getCommentText(comments, CommentsRestrict, MaxValue.COMMENT)}'`,
       `CURRENT_TIMESTAMP`,
       `CURRENT_TIMESTAMP`,
       getRandomInt(FIRST_ID, peopleCount),

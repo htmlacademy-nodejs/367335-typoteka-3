@@ -1,17 +1,9 @@
 'use strict';
 
 module.exports = {
-  DEFAULT_COMMAND: `--help`,
   DEFAULT_API_PORT: 3000,
-  DEFAULT_PORT: 8080,
   FIRST_ID: 1,
-  PUBLIC_DIR: `public`,
-  USER_ARGV_INDEX: 2,
   ARTICLES_PER_PAGE: 8,
-  TextLength: {
-    SHORT: 250,
-    LONG: 1000
-  },
   Env: {
     DEVELOPMENT: `development`,
     PRODUCTION: `production`
@@ -43,5 +35,31 @@ module.exports = {
       method: `info`,
       exitCode: `SUCCESS`
     }
+  },
+  MinValue: {
+    TITLE: 30,
+    ANNOUNCE: 30,
+    TEXT: 30,
+    COMMENT: 20,
+    PASSWORD: 6,
+    SUM: 100
+  },
+  MaxValue: {
+    FIRST_NAME: 100,
+    LAST_NAME: 100,
+    EMAIL: 100,
+    TITLE: 250,
+    ANNOUNCE: 250,
+    TEXT: 1000,
+    CATEGORY: 30,
+    COMMENT: 250,
+    PASSWORD: 128,
+    FILENAME: 256
+  },
+  HttpMethod: {
+    GET: `GET`,
+    POST: `POST`,
+    PUT: `PUT`,
+    DELETE: `DELETE`
   }
 };

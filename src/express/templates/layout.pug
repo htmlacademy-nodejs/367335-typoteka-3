@@ -1,11 +1,50 @@
 block constants
 
+mixin pagination(page, totalPages, width, prefix, mixClass=null)
+  -
+    let start = page - width;
+    let end = page + width;
+    if (start < 1) {
+      end += 1 - start;
+      start = 1;
+    }
+    if (end > totalPages) {
+      start -= end - totalPages;
+      end = totalPages;
+    }
+    if (start < 1) {
+      start = 1;
+    }
+    let i = start - 1
+
+  ul.pagination(class=mixClass)
+    li
+      a.pagination__button.button.button--backwards(class={'button--disabled': page === 1}, href=(page > 1 ? `${prefix}page=${page - 1}` : null), aria-label='Страница назад')
+    while i++ < end
+      li.pagination__item(class={'pagination__item--active': i === page})
+        a(href=(i === page ? null : `${prefix}page=${i}`))= i
+    li
+      a.pagination__button.button.button--forward(class={'button--disabled': page === totalPages}, href=(page < totalPages ? `${prefix}page=${page + 1}` : null), aria-label='Страница вперед')
+
+mixin errorMessage(error = ``, heading = ``)
+    if typeof error === `string` && error
+      p.form__error-message #{error}
+    else
+      - const errors = Object.values(error)
+      if errors.length
+        .form__validation-error
+          if heading
+            p.form__error-message #{heading}
+          ul.form__errors
+            each item in errors
+              li.form__error #{item}
+
 doctype html
 html(lang=`ru`)
   head
     meta(charset=`utf-8`)
     meta(name=`viewport`, content=`width=device-width,initial-scale=1`)
-    meta(name=`Description`, content=`Личный блог Типотека`)
+    meta(name=`description`, content=`Личный блог Типотека`)
     title Типотека
     link(rel=`preload`, href=`/fonts/Inter-Regular.woff2`, as=`font`, crossorigin=`anonymous`)
     link(rel=`preload`, href=`/fonts/Inter-Medium.woff2`, as=`font`, crossorigin=`anonymous`)
@@ -15,34 +54,8 @@ html(lang=`ru`)
       a:not([href]) {
         cursor: default;
       }
-  body(style=bodyStyle)
 
-    mixin pagination(page, totalPages, width, prefix, mixClass=null)
-      -
-        let start = page - width;
-        let end = page + width;
-        if (start < 1) {
-          end += 1 - start;
-          start = 1;
-        }
-        if (end > totalPages) {
-          start -= end - totalPages;
-          end = totalPages;
-        }
-        if (start < 1) {
-          start = 1;
-        }
-        let i = start - 1
-
-      ul.pagination(class=mixClass)
-        li
-          a.pagination__button.button.button--backwards(class={'button--disabled': page === 1}, href=(page > 1 ? `${prefix}page=${page - 1}` : null), aria-label='Страница назад')
-        while i++ < end
-          li.pagination__item(class={'pagination__item--active': i === page})
-            a(href=(i === page ? null : `${prefix}page=${i}`))= i
-        li
-          a.pagination__button.button.button--forward(class={'button--disabled': page === totalPages}, href=(page < totalPages ? `${prefix}page=${page + 1}` : null), aria-label='Страница вперед')
-
+  body
     div(class=bodyClass||`wrapper`)
       header(class=headerClass||`header`)
         a.header__logo.logo(href=`/`)
@@ -57,7 +70,7 @@ html(lang=`ru`)
         a.header__search.button.button--search(href=`/search`, aria-label=`поиск по сайту`)
       block main
       if !noFooter
-        footer(class=footerClass||`footer`)
+        footer.footer
           a.footer__copyright(href=`#!`, aria-label=`HTMLAcademy`)
             img(src=`/img/icons/HTMLAcademyLogo.svg`, alt=`HTMLAcademy`, width=`112`, height=`50`)
           span.footer__dot

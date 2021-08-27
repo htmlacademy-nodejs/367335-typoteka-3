@@ -1,0 +1,57 @@
+extends ../layout
+
+block constants
+  - const role = `author`;
+  - const bodyClass = `wrapper wrapper--nobackground`;
+  - const noFooter = true;
+  - const action = article.id ? `edit/${article.id}` : `add`;
+  - const heading = article.id ? `Редактировать публикацию` : `Новая публикация`;
+
+block main
+  main
+    section
+      .popup.popup--new-publication.popup--anti
+        .new-publication
+          form(action=`/articles/${action}`, method=`POST`, enctype=`multipart/form-data`)
+            .new-publication__header
+              h1 #{heading}
+              .new-publication__date-form
+                h3 Дата публикации
+                .new-publication__date-form-division
+                  .new-publication__date-block
+                    label(for=`new-publication-date`, aria-label=`Календарь`)
+                    input#new-publication-date(type=`text`, name=`date`, placeholder=`2019-03-21`, value=article.shortDate)
+              button.new-publication__button.button.button--colored(type=`submit`) Опубликовать
+            button.popup__button.button.button--popup-close(type=`button`, aria-label=`Закрыть окно`)
+              | Закрыть окно
+            .new-publication__form.form
+              .form__wrapper.form__wrapper--intro
+                .form__field
+                  label
+                    input(name=`title`, type=`text`, placeholder=`Заголовок`, value=article.title, minlength=MinValue.TITLE, maxlength=MaxValue.TITLE, required=``)
+                .form__field.form__field--post-image
+                  label
+                    input#image-name-field(type=`text`, placeholder=`Фотография`, readonly=``)
+                  .form__image-loader.form__image-loader--publication
+                    label
+                      input.visually-hidden(name=`picture`, type=`file`)
+                      | Обзор
+                  button.button.button--transparent(type=`button`) Удалить
+                .new-publication__category-wrapper
+                  each category, i in categories
+                    .new-publication__checkbox.new-publication__checkbox--auto
+                      input(id=`checkbox-${i}`, name=`Categories[]`, value=category.id type=`checkbox`, checked=article.Categories.includes(category.id))
+                      label(for=`checkbox-${i}`) #{category.title}
+                  a.new-publication__form-link.button.button--transparent(href=`#`) Добавить категорию
+              .form__wrapper.form__wrapper--text
+                .form__field.form__field--publication-text
+                  label
+                    textarea(name=`announce`, rows=`5`, placeholder=`Анонс публикации`, minlength=MinValue.ANNOUNCE, maxlength=MaxValue.ANNOUNCE, required=``) #{article.announce}
+                .form__field.form__field--publication-text
+                  label
+                    textarea(name=`fullText`, rows=`10`, placeholder=`Полный текст публикации`, minlength=MinValue.TEXT, maxlength=MaxValue.TEXT) #{article.fullText}
+            +errorMessage(errors)
+
+block scripts
+  script(src=`/js/vendor.js`)
+  script(src=`/js/main.js`)

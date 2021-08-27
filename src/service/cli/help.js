@@ -10,6 +10,7 @@ const HELP_CONTENT = `
     Команды:
     --version:            выводит номер версии
     --help:               печатает этот текст
+    --server:             запускает сервер API
     --fill <count>:       генерирует SQL для наполнения БД
     --filldb <count>:     наполняет БД
 `;

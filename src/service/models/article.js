@@ -1,22 +1,22 @@
 'use strict';
 
-const {TextLength: {SHORT, LONG}} = require(`../../constants`);
+const {MaxValue} = require(`../../constants`);
 const {DATE, NOW, setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`Article`, {
   title: {
-    type: setVarchar(SHORT),
+    type: setVarchar(MaxValue.TITLE),
     allowNull: false
   },
   announce: {
-    type: setVarchar(SHORT),
+    type: setVarchar(MaxValue.ANNOUNCE),
     allowNull: false
   },
   fullText: {
-    type: setVarchar(LONG)
+    type: setVarchar(MaxValue.TEXT)
   },
   picture: {
-    type: setVarchar(SHORT)
+    type: setVarchar(MaxValue.FILENAME)
   },
   pubDate: {
     type: DATE,
