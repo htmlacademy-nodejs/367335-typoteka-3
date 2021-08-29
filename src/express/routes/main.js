@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {modifyArticle} = require(`../lib/articles`);
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
+const upload = require(`../middlewares/upload`);
 
 const mainRouter = new Router();
 const api = require(`../api`).getAPI();
@@ -59,6 +60,27 @@ mainRouter.get(`/register`, (req, res) => {
     payload: JSON.parse(payload),
     errors: JSON.parse(errors)
   });
+});
+
+mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
+  const {body, file} = req;
+  const userData = {
+    ...body,
+    avatar: file ? file.filename : body.pictureUploaded // если пользователь не загрузил новую картинку, оставляем прежнюю
+  };
+  delete userData.pictureUploaded;
+
+  try {
+    await api.createUser(userData);
+    res.redirect(`/login`);
+  } catch (err) {
+    // передаем ранее заполненные данные для пробрасывания в форму
+    const payloadStr = encodeURIComponent(JSON.stringify(userData));
+
+    const errorStr = encodeURIComponent(JSON.stringify(err.response.data));
+
+    res.redirect(`/register?payload=${payloadStr}&errors=${errorStr}`);
+  }
 });
 
 module.exports = mainRouter;

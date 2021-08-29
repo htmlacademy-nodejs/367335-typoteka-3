@@ -2,7 +2,7 @@
 
 const {nanoid} = require(`nanoid`);
 const dayjs = require(`dayjs`);
-const bcrypt = require(`bcrypt`);
+const {hashSync} = require(`../lib/password`);
 
 const {ExitCode} = require(`../../constants`);
 const {getRandomInt, shuffle, outputRes, writeFileToArray} = require(`../../utils`);
@@ -132,7 +132,7 @@ const generateUser = (user) => {
     firstName,
     lastName,
     email: `${nanoid(emailPrependLength)}@${nanoid(emailAppendLength)}.${getRandomItem(EMAIL_DOMAINS)}`,
-    passwordHash: bcrypt.hashSync(nanoid(passwordLength), SALT_ROUNDS),
+    passwordHash: hashSync(nanoid(passwordLength), SALT_ROUNDS),
     avatar: generatePicture()
   };
 };

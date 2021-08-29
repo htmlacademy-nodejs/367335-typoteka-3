@@ -5,7 +5,7 @@ const defineArticle = require(`./article`);
 const defineCategory = require(`./category`);
 const defineComment = require(`./comment`);
 const defineArticleCategory = require(`./article-category`);
-const {Aliase: {ARTICLES, CATEGORIES, COMMENTS, ARTICLE_CATEGORIES}} = require(`./common`);
+const {Aliase: {ARTICLES, CATEGORIES, COMMENTS, ARTICLE_CATEGORIES, USERS}} = require(`./common`);
 
 const define = (sequelize) => {
   const Category = defineCategory(sequelize);
@@ -22,10 +22,10 @@ const define = (sequelize) => {
   Category.hasMany(ArticleCategory, {as: ARTICLE_CATEGORIES});
 
   User.hasMany(Comment, {as: COMMENTS, foreignKey: `UserId`, onDelete: `cascade`});
-  Comment.belongsTo(User, {foreignKey: `UserId`});
+  Comment.belongsTo(User, {as: USERS, foreignKey: `UserId`});
 
   User.hasMany(Article, {as: ARTICLES, foreignKey: `UserId`, onDelete: `cascade`});
-  Article.belongsTo(User, {foreignKey: `UserId`});
+  Article.belongsTo(User, {as: USERS, foreignKey: `UserId`});
 
   return {Category, Comment, User, Article, ArticleCategory};
 };

@@ -9,29 +9,31 @@ block main
           | Закрыть окно
         h2.popup__title Регистрация
         .popup__form.popup__form--active.form.form--register
-          form(action=`#`, method=`get`)
+          form(action=`/register`, method=`POST`, enctype=`multipart/form-data`, autocomplete=`off`)
             .form__field
               label
-                input(type=`email`, name="email" placeholder=`Электронная почта`, maxlength=MaxValue.EMAIL, required=``)
+                input(type=`email`, name="email", value=payload.email, placeholder=`Электронная почта`, maxlength=MaxValue.EMAIL, required=``)
             .form__field
               label
-                input(type=`text`, name="firstname", placeholder=`Имя`, maxlength=MaxValue.FIRST_NAME, required=``)
+                input(type=`text`, name="firstName", value=payload.firstName, placeholder=`Имя`, maxlength=MaxValue.FIRST_NAME, required=``)
             .form__field
               label
-                input(type=`text`, name="lastname", placeholder=`Фамилия`, maxlength=MaxValue.LAST_NAME)
+                input(type=`text`, name="lastName", value=payload.lastName, placeholder=`Фамилия`, maxlength=MaxValue.LAST_NAME)
             .form__field
               label
                 input(type=`password`, name=`password`, placeholder=`Пароль`, minlength=MinValue.PASSWORD, maxlength=MaxValue.PASSWORD, required=``)
             .form__field
               label
-                input(type=`password`, name=`password_again`, placeholder=`Повтор пароля`, minlength=MinValue.PASSWORD, maxlength=MaxValue.PASSWORD, required=``)
+                input(type=`password`, name=`passwordRepeated`, placeholder=`Повтор пароля`, minlength=MinValue.PASSWORD, maxlength=MaxValue.PASSWORD, required=``)
             +errorMessage(errors, `При регистрации произошли ошибки:`)
             .form__image-loader
               a.form__avatar.avatar
                 img(src=`/img/icons/smile.svg`, alt=`аватар пользователя`)
               label
-                input.visually-hidden(type=`file`)
+                input.visually-hidden(type=`file`, name="avatar")
                 | Загрузить фото профиля
+              //- Отправляем имя загруженной картинки, которое переиспользуется, если не выбрана новая
+              input(type=`hidden`, name=`pictureUploaded`, value=payload.avatar)
             button.form__submit-btn.form__submit-btn--register.button.button--colored(type=`submit`) Зарегистрироваться
 
 block scripts

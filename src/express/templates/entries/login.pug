@@ -9,7 +9,7 @@ block main
           | Закрыть окно
         h2.popup__title Войти
         .popup__form.form.form--log-in
-          form(action=`#`, method=`get`)
+          form(action=`/login`, method=`POST`)
             .form__field
               label
                 input(name=`email`, type=`email`, placeholder=`Электронная почта`, required=``)

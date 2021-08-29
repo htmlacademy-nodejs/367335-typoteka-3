@@ -2,14 +2,13 @@
 
 const {Op} = require(`sequelize`);
 const {Aliase: {CATEGORIES}} = require(`../models/common`);
+const UserRelatedService = require(`./user-related`);
 
-class SearchService {
+class SearchService extends UserRelatedService {
   constructor({models}) {
-    this._Article = models.Article;
-  }
+    super({models});
 
-  findAll(searchText) {
-    return this._articles.filter((article) => article.title.includes(searchText));
+    this._Article = models.Article;
   }
 
   async findAll(searchText) {
@@ -19,7 +18,7 @@ class SearchService {
           [Op.substring]: searchText
         }
       },
-      include: [CATEGORIES]
+      include: [CATEGORIES, this._userInclusion]
     });
     return articles.map((article) => article.get());
   }
