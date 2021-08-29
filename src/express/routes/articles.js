@@ -41,7 +41,7 @@ articlesRouter.post(`/:id`, async (req, res) => {
   try {
     await api.createComment(id, {
       ...body,
-      PersonId: 1 // временная заглушка для прохождения валидации
+      UserId: 1 // временная заглушка для прохождения валидации
     });
     res.status(StatusCodes.CREATED).redirect(`/articles/${id}`);
   } catch (err) {

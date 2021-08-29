@@ -8,7 +8,7 @@ module.exports = {
     ARTICLES: `Articles`,
     CATEGORIES: `Categories`,
     ARTICLE_CATEGORIES: `ArticleCategories`,
-    PEOPLE: `People`
+    USERS: `Users`
   },
   DATE,
   NOW,

@@ -60,7 +60,7 @@ const sendArticle = async (req, res) => {
     pubDate: date.format(`YYYY-MM-DD HH:mm:ss`),
     picture: file ? file.filename : body.picture_uploaded || ``, // если пользователь не загрузил новую картинку, оставляем прежнюю
     Categories: ensureArray(body.Categories).map(Number).filter(Boolean),
-    PersonId: 1 // временная заглушка для прохождения валидации
+    UserId: 1 // временная заглушка для прохождения валидации
   };
   delete data.date;
   delete data.picture_uploaded;

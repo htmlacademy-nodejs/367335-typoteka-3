@@ -4,7 +4,7 @@ const {writeFile} = require(`fs`).promises;
 const {FIRST_ID, MaxValue} = require(`../../constants`);
 const {getRandomInt, outputRes} = require(`../../utils`);
 const {
-  generatePerson,
+  generateUser,
   generatePicture,
   getDataFromDataFiles,
   getFullText,
@@ -21,8 +21,8 @@ const CommentsRestrict = {
   MAX: 8
 };
 
-const generatePeople = (people) => people.map((person) => {
-  const {firstName, lastName, email, passwordHash, avatar} = generatePerson(person);
+const generateUsers = (users) => users.map((user) => {
+  const {firstName, lastName, email, passwordHash, avatar} = generateUser(user);
 
   return [
     `'${firstName}'`,
@@ -41,7 +41,7 @@ const generateCategories = (categories) => categories.map((category) => [
   `CURRENT_TIMESTAMP`
 ]);
 
-const generateArticles = (articlesCount, peopleCount, sentences, titles) => {
+const generateArticles = (articlesCount, usersCount, sentences, titles) => {
   return Array(articlesCount).fill([]).map(() => [
     `'${getRandomItem(titles)}'`,
     `'${getAnnounce(sentences, MaxValue.ANNOUNCE)}'`,
@@ -50,7 +50,7 @@ const generateArticles = (articlesCount, peopleCount, sentences, titles) => {
     `'${getRandomDate()}'`,
     `CURRENT_TIMESTAMP`,
     `CURRENT_TIMESTAMP`,
-    getRandomInt(FIRST_ID, peopleCount)
+    getRandomInt(FIRST_ID, usersCount)
   ]);
 };
 
@@ -71,7 +71,7 @@ const generateArticlesToCategories = (articlesCount, categoriesCount) => {
   }, []);
 };
 
-const generateComments = (articlesCount, peopleCount, comments) => {
+const generateComments = (articlesCount, usersCount, comments) => {
   const {MIN, MAX} = CommentsRestrict;
 
   return Array(articlesCount).fill(1).reduce((acc, item, articleId) => [
@@ -80,7 +80,7 @@ const generateComments = (articlesCount, peopleCount, comments) => {
       `'${getCommentText(comments, CommentsRestrict, MaxValue.COMMENT)}'`,
       `CURRENT_TIMESTAMP`,
       `CURRENT_TIMESTAMP`,
-      getRandomInt(FIRST_ID, peopleCount),
+      getRandomInt(FIRST_ID, usersCount),
       articleId + 1
     ])
   ], []);
@@ -90,7 +90,7 @@ const formatSqlValues = (rows) => `(${rows.map((row) => row.join(`, `)).join(`),
 
 const generateSql = ({
   articlesCount,
-  people,
+  users,
   categories,
   comments,
   sentences,
@@ -100,29 +100,29 @@ const generateSql = ({
 DO $$ BEGIN
 
 -- Очистка БД
-DELETE FROM public."People";
+DELETE FROM public."Users";
 DELETE FROM public."Categories";
 DELETE FROM public."Articles";
 PERFORM setval('public."Articles_id_seq"'::regclass, 1, false);
-PERFORM setval('public."People_id_seq"'::regclass, 1, false);
+PERFORM setval('public."Users_id_seq"'::regclass, 1, false);
 PERFORM setval('public."Categories_id_seq"'::regclass, 1, false);
 PERFORM setval('public."Comments_id_seq"'::regclass, 1, false);
 
 -- Добавление пользователей
-INSERT INTO public."People" ("firstName", "lastName", "email", "passwordHash", "avatar", "createdAt", "updatedAt") VALUES
-${formatSqlValues(generatePeople(people))}
+INSERT INTO public."Users" ("firstName", "lastName", "email", "passwordHash", "avatar", "createdAt", "updatedAt") VALUES
+${formatSqlValues(generateUsers(users))}
 
 -- Добавление категорий
 INSERT INTO public."Categories" ("title", "createdAt", "updatedAt") VALUES
 ${formatSqlValues(generateCategories(categories))}
 
 -- Добавление публикаций
-INSERT INTO public."Articles" ("title", "announce", "fullText", "picture", "pubDate", "createdAt", "updatedAt", "PersonId") VALUES
-${formatSqlValues(generateArticles(articlesCount, people.length, sentences, titles))}
+INSERT INTO public."Articles" ("title", "announce", "fullText", "picture", "pubDate", "createdAt", "updatedAt", "UserId") VALUES
+${formatSqlValues(generateArticles(articlesCount, users.length, sentences, titles))}
 
 -- Добавление комментариев
-INSERT INTO public."Comments" ("text", "createdAt", "updatedAt", "PersonId", "ArticleId") VALUES
-${formatSqlValues(generateComments(articlesCount, people.length, comments))}
+INSERT INTO public."Comments" ("text", "createdAt", "updatedAt", "UserId", "ArticleId") VALUES
+${formatSqlValues(generateComments(articlesCount, users.length, comments))}
 
 -- Связь публикаций с категориями
 INSERT INTO public."ArticleCategories" ("createdAt", "updatedAt", "ArticleId", "CategoryId") VALUES
@@ -132,7 +132,7 @@ END $$;`;
 
 module.exports = {
   name: `--fill`,
-  async run([countStr]) {
+  async run([countStr = 1]) {
     const data = await getDataFromDataFiles(countStr);
     const content = generateSql(data);
 

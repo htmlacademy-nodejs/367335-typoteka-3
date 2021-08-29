@@ -3,6 +3,11 @@
 const Joi = require(`joi`);
 
 module.exports = Joi.object({
-  articleId: Joi.number().integer().min(1),
-  commentId: Joi.number().integer().min(1).optional()
+  articleId: Joi.number()
+    .integer()
+    .positive(),
+  commentId: Joi.number()
+    .integer()
+    .positive()
+    .optional()
 });

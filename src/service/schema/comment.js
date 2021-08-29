@@ -8,8 +8,8 @@ module.exports = Joi.object({
     .min(MinValue.COMMENT)
     .max(MaxValue.COMMENT)
     .required(),
-  PersonId: Joi.number()
+  UserId: Joi.number()
     .integer()
-    .min(1)
+    .positive(1)
     .required()
 });

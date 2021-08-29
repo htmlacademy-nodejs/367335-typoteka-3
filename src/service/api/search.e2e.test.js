@@ -10,7 +10,7 @@ const {generateData} = require(`../lib/mock-utils`);
 const search = require(`./search`);
 const SearchService = require(`../data-services/search`);
 
-const mockPeople = [`Андрей Рогов`, `Арсений Петухов`, `Виктор Золотов`, `Владимир Семенов`, `Иван Дурак`, `Михаил Юрьев`, `Петр Петров`, `Роман Доброхотов`, `Юрий Михайлов`];
+const mockUsers = [`Андрей Рогов`, `Арсений Петухов`, `Виктор Золотов`, `Владимир Семенов`, `Иван Дурак`, `Михаил Юрьев`, `Петр Петров`, `Роман Доброхотов`, `Юрий Михайлов`];
 const mockCategories = [`IT`, `Без рамки`, `Деньги`, `Деревья`, `Дети`, `Железо`, `За жизнь`, `Кино`, `Коты`, `Музыка`, `Отношения`, `Программирование`, `Разное`, `Россия`, `Соцсети`, `Фронтенд`];
 const mockArticles = [
   {
@@ -140,7 +140,7 @@ const app = express();
 app.use(express.json());
 
 beforeAll(async () => {
-  await initDB(mockDB, generateData({categories: mockCategories, articles: mockArticles, people: mockPeople}));
+  await initDB(mockDB, generateData({categories: mockCategories, articles: mockArticles, users: mockUsers}));
   search(app, new SearchService(mockDB));
 });
 

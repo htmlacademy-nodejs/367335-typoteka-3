@@ -10,7 +10,7 @@ const articles = require(`./articles`);
 const ArticlesService = require(`../data-services/articles`);
 const CommentsService = require(`../data-services/comments`);
 
-const mockPeople = [`Андрей Рогов`, `Арсений Петухов`, `Виктор Золотов`, `Владимир Семенов`, `Иван Дурак`, `Михаил Юрьев`, `Петр Петров`, `Роман Доброхотов`, `Юрий Михайлов`];
+const mockUsers = [`Андрей Рогов`, `Арсений Петухов`, `Виктор Золотов`, `Владимир Семенов`, `Иван Дурак`, `Михаил Юрьев`, `Петр Петров`, `Роман Доброхотов`, `Юрий Михайлов`];
 const mockCategories = [`IT`, `Без рамки`, `Деньги`, `Деревья`, `Дети`, `Железо`, `За жизнь`, `Кино`, `Коты`, `Музыка`, `Отношения`, `Программирование`, `Разное`, `Россия`, `Соцсети`, `Фронтенд`];
 const mockArticles = [
   {
@@ -116,7 +116,7 @@ const sampleArticle = {
   pubDate: `2020-09-21 15:59:06`,
   Categories: [1, 2],
   picture: ``, // поле должно быть, но пустая строка валидна
-  PersonId: 1
+  UserId: 1
 };
 const sampleKeys = Object.keys(sampleArticle);
 
@@ -125,7 +125,7 @@ const createAPI = async (logging = false) => {
   await initDB(mockDB, generateData({
     categories: mockCategories.slice(),
     articles: mockArticles.slice(),
-    people: mockPeople.slice()
+    users: mockUsers.slice()
   }));
   const app = express();
   app.use(express.json());
@@ -302,7 +302,7 @@ describe(`API returns a list of comments to given article`, () => {
 describe(`API creates a comment if data is valid`, () => {
   const newComment = {
     text: `Валидному комментарию достаточно этого поля`,
-    PersonId: 1
+    UserId: 1
   };
   let app;
   let response;

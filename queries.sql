@@ -17,7 +17,7 @@ SELECT "id", "title", COUNT(ac."ArticleId") AS "articlesCount"
 --Получить список публикаций (идентификатор публикации, заголовок публикации, анонс публикации, дата публикации, имя и фамилия автора, контактный email, количество комментариев, наименование категорий). Сначала свежие публикации:
 SELECT a."id", a."title", "announce", "pubDate", CONCAT("firstName", ' ', "lastName") AS "author", "email", COUNT(DISTINCT cm."id") AS "commentsCount", STRING_AGG(DISTINCT ct."title", ', ') as "categoriesList"
   FROM "Articles" a
-  JOIN "People" p ON p."id" = a."PersonId"
+  JOIN "Users" p ON p."id" = a."UserId"
   FULL JOIN "Comments" cm ON a."id" = cm."ArticleId"
   LEFT JOIN "ArticleCategories" ac ON ac."ArticleId" = a."id"
   LEFT JOIN "Categories" ct ON ac."CategoryId" = ct."id"
@@ -27,7 +27,7 @@ SELECT a."id", a."title", "announce", "pubDate", CONCAT("firstName", ' ', "lastN
 --Получить полную информацию определённой публикации (идентификатор публикации, заголовок публикации, анонс, полный текст публикации, дата публикации, путь к изображению, имя и фамилия автора, контактный email, количество комментариев, наименование категорий);
 SELECT a."id", a."title", "announce", "pubDate", CONCAT("firstName", ' ', "lastName") AS "author", "email", COUNT(DISTINCT cm."id") AS "commentsCount", STRING_AGG(DISTINCT ct."title", ', ') as "categoriesList"
   FROM "Articles" a
-  JOIN "People" p ON p.id = a."PersonId"
+  JOIN "Users" p ON p.id = a."UserId"
   FULL JOIN "Comments" cm ON a."id" = cm."ArticleId"
   LEFT JOIN "ArticleCategories" ac ON ac."ArticleId" = a."id"
   LEFT JOIN "Categories" ct ON ac."CategoryId" = ct."id"
@@ -37,14 +37,14 @@ SELECT a."id", a."title", "announce", "pubDate", CONCAT("firstName", ' ', "lastN
 --Получить список из 5 свежих комментариев (идентификатор комментария, идентификатор публикации, имя и фамилия автора, текст комментария):
 SELECT c."id", "ArticleId", CONCAT("firstName", ' ', "lastName") AS "author", "text"
   FROM "Comments" c
-  JOIN "People" p ON p."id" = c."PersonId"
+  JOIN "Users" p ON p."id" = c."UserId"
   ORDER BY c."id" DESC
   LIMIT 5;
 
 --Получить список комментариев для определённой публикации (идентификатор комментария, идентификатор публикации, имя и фамилия автора, текст комментария). Сначала новые комментарии
 SELECT c."id", "ArticleId", CONCAT("firstName", ' ', "lastName") AS "author", "text"
   FROM "Comments" c
-  JOIN "People" p ON p."id" = c."PersonId"
+  JOIN "Users" p ON p."id" = c."UserId"
   WHERE "ArticleId" = 1
   ORDER BY c."id" DESC;
 

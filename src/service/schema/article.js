@@ -26,8 +26,8 @@ module.exports = Joi.object({
     .items(Joi.number().integer().positive())
     .min(1)
     .required(),
-  PersonId: Joi.number()
+  UserId: Joi.number()
     .integer()
-    .min(1)
+    .positive(1)
     .required()
 });
