@@ -4,6 +4,7 @@ module.exports = {
   DEFAULT_API_PORT: 3000,
   FIRST_ID: 1,
   ARTICLES_PER_PAGE: 8,
+  USERNAME_PATTERN: `^[А-ЯА-яЁёA-Za-z]{1,100}$`,
   Env: {
     DEVELOPMENT: `development`,
     PRODUCTION: `production`

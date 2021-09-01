@@ -2,7 +2,7 @@
 
 const {nanoid} = require(`nanoid`);
 const dayjs = require(`dayjs`);
-const bcrypt = require(`bcrypt`);
+const {hashSync} = require(`../lib/password`);
 
 const {ExitCode} = require(`../../constants`);
 const {getRandomInt, shuffle, outputRes, writeFileToArray} = require(`../../utils`);
@@ -39,7 +39,7 @@ const AnnouncesRestrict = {
 const DataFilePath = {
   CATEGORIES: `./data/categories.txt`,
   COMMENTS: `./data/comments.txt`,
-  PEOPLE: `./data/people.txt`,
+  USERS: `./data/users.txt`,
   SENTENCES: `./data/sentences.txt`,
   TITLES: `./data/titles.txt`
 };
@@ -106,15 +106,15 @@ const getDataFromDataFiles = async (countStr) => {
     process.exit(ExitCode.ERROR);
   }
 
-  const [categories, comments, sentences, titles, people] = await Promise.all([
+  const [categories, comments, sentences, titles, users] = await Promise.all([
     writeFileToArray(DataFilePath.CATEGORIES),
     writeFileToArray(DataFilePath.COMMENTS),
     writeFileToArray(DataFilePath.SENTENCES),
     writeFileToArray(DataFilePath.TITLES),
-    writeFileToArray(DataFilePath.PEOPLE)
+    writeFileToArray(DataFilePath.USERS)
   ]);
 
-  return {articlesCount, people, categories, comments, sentences, titles};
+  return {articlesCount, users, categories, comments, sentences, titles};
 };
 
 const generatePicture = () => {
@@ -122,30 +122,30 @@ const generatePicture = () => {
   return `${getId(imgLength).toLowerCase()}.${getRandomItem(IMG_EXTENSIONS)}`;
 };
 
-const generatePerson = (person) => {
+const generateUser = (user) => {
   const emailPrependLength = getRandomInt(EmailRestrict.MIN, EmailRestrict.MAX);
   const emailAppendLength = getRandomInt(EmailRestrict.MIN, EmailRestrict.MAX);
   const passwordLength = getRandomInt(PasswordRestrict.MIN, PasswordRestrict.MAX);
-  const [firstName, lastName] = person.split(` `);
+  const [firstName, lastName] = user.split(` `);
 
   return {
     firstName,
     lastName,
     email: `${nanoid(emailPrependLength)}@${nanoid(emailAppendLength)}.${getRandomItem(EMAIL_DOMAINS)}`,
-    passwordHash: bcrypt.hashSync(nanoid(passwordLength), SALT_ROUNDS),
+    passwordHash: hashSync(nanoid(passwordLength), SALT_ROUNDS),
     avatar: generatePicture()
   };
 };
 
-const generateData = ({categories, articles, people}) => ({
+const generateData = ({categories, articles, users}) => ({
   categories: categories.map((item) => ({title: item})),
   articles,
-  people: people.map(generatePerson)
+  users: users.map(generateUser)
 });
 
 module.exports = {
   generateData,
-  generatePerson,
+  generateUser,
   generatePicture,
   getDataFromDataFiles,
   getAnnounce,

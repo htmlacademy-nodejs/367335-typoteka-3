@@ -3,7 +3,7 @@
 const {MaxValue} = require(`../../constants`);
 const {setChar, setVarchar} = require(`./common`);
 
-const define = (sequelize) => sequelize.define(`People`, {
+const define = (sequelize) => sequelize.define(`User`, {
   firstName: {
     type: setVarchar(MaxValue.FIRST_NAME),
     allowNull: false

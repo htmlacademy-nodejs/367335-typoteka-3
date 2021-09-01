@@ -26,7 +26,7 @@ const exitWithError = (err) => {
   process.exit(ExitCode.ERROR);
 };
 
-const generatePosts = ({articlesCount, people, categories, comments, sentences, titles}) => {
+const generatePosts = ({articlesCount, users, categories, comments, sentences, titles}) => {
   return Array(articlesCount).fill({}).map(() => ({
     title: getRandomItem(titles),
     announce: getAnnounce(sentences, MaxValue.ANNOUNCE),
@@ -36,9 +36,9 @@ const generatePosts = ({articlesCount, people, categories, comments, sentences, 
     categories: getCategories(categories),
     Comments: Array(getRandomIndex(comments)).fill({}).map(() => ({
       text: getCommentText(comments, {}, MaxValue.COMMENT),
-      PersonId: getRandomInt(FIRST_ID, people.length)
+      UserId: getRandomInt(FIRST_ID, users.length)
     })),
-    PersonId: getRandomInt(FIRST_ID, people.length)
+    UserId: getRandomInt(FIRST_ID, users.length)
   }));
 };
 
@@ -60,7 +60,7 @@ module.exports = {
       comments,
       sentences,
       titles,
-      people
+      users
     } = await getDataFromDataFiles(countStr);
 
     try {
@@ -72,9 +72,9 @@ module.exports = {
           comments,
           sentences,
           titles,
-          people
+          users
         }),
-        people
+        users
       }));
     } catch (err) {
       exitWithError(err);

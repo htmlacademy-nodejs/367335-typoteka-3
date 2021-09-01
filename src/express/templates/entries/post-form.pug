@@ -37,6 +37,8 @@ block main
                       input.visually-hidden(name=`picture`, type=`file`)
                       | Обзор
                   button.button.button--transparent(type=`button`) Удалить
+                  //- Отправляем имя загруженной картинки, которое переиспользуется, если не выбрана новая
+                  input(type=`hidden`, name=`pictureUploaded`, value=article.picture)
                 .new-publication__category-wrapper
                   each category, i in categories
                     .new-publication__checkbox.new-publication__checkbox--auto

@@ -1,26 +1,35 @@
 'use strict';
 
 const {Aliase: {CATEGORIES, COMMENTS}} = require(`../models/common`);
+const UserRelatedService = require(`./user-related`);
 
-const getInclude = (comments) => {
-  const include = [CATEGORIES];
-  if (Number(comments)) {
-    include.push(COMMENTS);
-  }
-  return include;
-};
-
-class ArticlesService {
+class ArticlesService extends UserRelatedService {
   constructor({models}) {
+    super({models});
+
     this._Article = models.Article;
     this._Comment = models.Comment;
     this._Category = models.Category;
     this.entityName = `article`;
   }
 
+  _getInclude(comments) {
+    const include = [CATEGORIES, this._userInclusion];
+
+    if (Number(comments)) {
+      include.push({
+        model: this._Comment,
+        as: COMMENTS,
+        include: [this._userInclusion]
+      });
+    }
+
+    return include;
+  }
+
   async findAll(comments = 0) {
     const articles = await this._Article.findAll({
-      include: getInclude(comments)
+      include: this._getInclude(comments)
     });
     return articles.map((item) => item.get());
   }
@@ -29,14 +38,16 @@ class ArticlesService {
     const {count, rows} = await this._Article.findAndCountAll({
       limit,
       offset,
-      include: getInclude(comments),
+      include: this._getInclude(comments),
       distinct: true
     });
     return {count, articles: rows};
   }
 
   async findOne({id, comments = 0}) {
-    const article = await this._Article.findByPk(id, {include: getInclude(comments)});
+    const article = await this._Article.findByPk(id, {
+      include: this._getInclude(comments)
+    });
     if (article) {
       return article.get({plain: true});
     }
