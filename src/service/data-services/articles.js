@@ -11,17 +11,19 @@ class ArticlesService extends UserRelatedService {
     this._Comment = models.Comment;
     this._Category = models.Category;
     this.entityName = `article`;
+
+    this._commentInclusion = {
+      model: this._Comment,
+      as: COMMENTS,
+      include: [this._userInclusion]
+    };
   }
 
   _getInclude(comments) {
     const include = [CATEGORIES, this._userInclusion];
 
     if (Number(comments)) {
-      include.push({
-        model: this._Comment,
-        as: COMMENTS,
-        include: [this._userInclusion]
-      });
+      include.push(this._commentInclusion);
     }
 
     return include;
@@ -29,7 +31,8 @@ class ArticlesService extends UserRelatedService {
 
   async findAll(comments = 0) {
     const articles = await this._Article.findAll({
-      include: this._getInclude(comments)
+      include: this._getInclude(comments),
+      // order: [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]]
     });
     return articles.map((item) => item.get());
   }
@@ -46,7 +49,8 @@ class ArticlesService extends UserRelatedService {
 
   async findOne({id, comments = 0}) {
     const article = await this._Article.findByPk(id, {
-      include: this._getInclude(comments)
+      include: this._getInclude(comments),
+      // order: [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]]
     });
     if (article) {
       return article.get({plain: true});
@@ -56,12 +60,12 @@ class ArticlesService extends UserRelatedService {
 
   async create(articleData) {
     const article = await this._Article.create(articleData);
-    await article.addCategories(articleData.categories);
+    await article.addCategories(articleData.Categories);
     return article.get();
   }
 
-  async update(id, articleBody) {
-    const [affectedRows] = await this._Article.update(articleBody, {
+  async update(id, articleData) {
+    const [affectedRows] = await this._Article.update(articleData, {
       where: {id}
     });
     return Boolean(affectedRows);

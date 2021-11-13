@@ -12,11 +12,17 @@ class UsersService {
   }
 
   async findByEmail(email) {
-    const user = await this._User.findOne({
+    const userData = await this._User.findOne({
       where: {email}
     });
 
-    return user && user.get();
+    const user = userData && userData.get();
+
+    if (user && user.id) {
+      user.isAdmin = user.id === 1;
+    }
+
+    return user;
   }
 }
 

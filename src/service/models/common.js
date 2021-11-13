@@ -1,6 +1,6 @@
 'use strict';
 
-const {DataTypes: {CHAR, STRING, DATE, NOW, SMALLINT}} = require(`sequelize`);
+const {DataTypes: {STRING, DATE, NOW, SMALLINT}} = require(`sequelize`);
 
 module.exports = {
   Aliase: {
@@ -13,6 +13,5 @@ module.exports = {
   DATE,
   NOW,
   SMALLINT,
-  setChar: CHAR,
   setVarchar: STRING
 };

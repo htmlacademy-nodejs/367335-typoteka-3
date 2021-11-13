@@ -50,9 +50,23 @@ html(lang=`ru`)
     link(rel=`preload`, href=`/fonts/Inter-Medium.woff2`, as=`font`, crossorigin=`anonymous`)
     link(rel=`preload`, href=`/fonts/SFProDisplay-Regular.woff2`, as=`font`, crossorigin=`anonymous`)
     link(rel=`stylesheet`, href=`/css/style.min.css`)
+
+    //- css overrides
     style.
       a:not([href]) {
         cursor: default;
+      }
+
+      .preview__breadcrumbs {
+        flex-wrap: wrap;
+      }
+
+      .preview__item {
+        overflow: hidden; /* FF avoid breaking inside */
+      }
+
+      .header__navigation {
+        box-shadow: 0 0 15px #dddddd;
       }
 
   body
@@ -61,10 +75,11 @@ html(lang=`ru`)
         a.header__logo.logo(href=`/`)
           img.logo__image(src=`/img/icons/logo-image-only.svg`, alt=`логотип Тайпотеки`)
           span.logo__name Типотека
-        if role === `author`
-          include partials/nav-author
-        else if role === `reader`
-          include partials/nav-reader
+        if user
+          if user.isAdmin
+            include partials/nav-author
+          else
+            include partials/nav-reader
         else
           include partials/nav-guest
         a.header__search.button.button--search(href=`/search`, aria-label=`поиск по сайту`)

@@ -3,6 +3,8 @@
 const {Router} = require(`express`);
 const {modifyArticle} = require(`../lib/articles`);
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
+const {getUrlJson} = require(`../../utils`);
+const auth = require(`../middlewares/auth`);
 const upload = require(`../middlewares/upload`);
 
 const mainRouter = new Router();
@@ -14,6 +16,7 @@ mainRouter.get(`/`, async (req, res) => {
 
   const limit = ARTICLES_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
+  const {user} = req.session;
 
   const [{count, articles}, categories] = await Promise.all([
     api.getArticles({offset, limit, comments: 1}),
@@ -24,41 +27,68 @@ mainRouter.get(`/`, async (req, res) => {
     articles: articles.map(modifyArticle),
     categories,
     page,
-    totalPages: Math.ceil(count / limit)
+    totalPages: Math.ceil(count / limit),
+    user
   });
 });
 
-mainRouter.get(`/categories`, async (req, res) => {
+mainRouter.get(`/categories`, auth, async (req, res) => {
+  const {user} = req.session;
   const categories = await api.getCategories();
-  res.render(`all-categories`, {categories});
+  res.render(`all-categories`, {categories, user});
 });
 
 mainRouter.get(`/search`, async (req, res) => {
+  const {user} = req.session;
   const {query} = req.query;
+
   try {
     const results = await api.search(query);
-    res.render(`search`, {results: results.map((article) => {
-      return modifyArticle(article, query);
-    }), query});
-  } catch (error) {
-    res.render(`search`, {results: [], query});
+    res.render(`search`, {
+      results: results.map((article) => modifyArticle(article, query)),
+      query,
+      user
+    });
+  } catch (err) {
+    res.render(`search`, {results: [], query, user});
   }
 });
 
 mainRouter.get(`/login`, (req, res) => {
   const {payload = `{}`, errors = `{}`} = req.query;
+
   res.render(`login`, {
     payload: JSON.parse(payload),
     errors: JSON.parse(errors)
   });
 });
 
+mainRouter.post(`/login`, async (req, res) => {
+  const {email, password} = req.body;
+
+  try {
+    const user = await api.auth(email, password);
+    req.session.user = user;
+    req.session.save(() => res.redirect(`/`));
+  } catch (err) {
+    const errorText = err.response ? err.response.data : err.message;
+    res.redirect(`/login?payload=${getUrlJson({email})}&errors=${getUrlJson(errorText)}`);
+  }
+});
+
+mainRouter.get(`/logout`, (req, res) => {
+  delete req.session.user;
+  req.session.save(() => res.redirect(`/login`));
+});
+
 mainRouter.get(`/register`, (req, res) => {
+  const {user} = req.session;
   const {payload = `{}`, errors = `{}`} = req.query;
 
   res.render(`sign-up`, {
     payload: JSON.parse(payload),
-    errors: JSON.parse(errors)
+    errors: JSON.parse(errors),
+    user
   });
 });
 
@@ -74,12 +104,8 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
     await api.createUser(userData);
     res.redirect(`/login`);
   } catch (err) {
-    // передаем ранее заполненные данные для пробрасывания в форму
-    const payloadStr = encodeURIComponent(JSON.stringify(userData));
-
-    const errorStr = encodeURIComponent(JSON.stringify(err.response.data));
-
-    res.redirect(`/register?payload=${payloadStr}&errors=${errorStr}`);
+    const errorText = err.response ? err.response.data : err.message;
+    res.redirect(`/register?payload=${getUrlJson(userData)}&errors=${getUrlJson(errorText)}`);
   }
 });
 

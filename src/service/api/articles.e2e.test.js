@@ -232,7 +232,7 @@ describe(`API refuses to create an article if data is invalid`, () => {
   test(`When field value is wrong response code is 400`, async () => {
     const badArticles = [
       {...newArticle, title: `too short`},
-      {...newArticle, categories: []}
+      {...newArticle, Categories: []}
     ];
     for (const badArticle of badArticles) {
       await request(app)
@@ -267,7 +267,7 @@ test(`API returns status code 404 when trying to change non-existent article`, a
     fullText: `валидной статьи (длина текста не менее 30 символов)`,
     pubDate: `2020-09-21 15:59:06`,
     picture: `passed-name.jpg`,
-    categories: [1]
+    Categories: [1]
   };
   const app = await createAPI();
 
@@ -279,7 +279,7 @@ test(`API returns status code 400 when trying to change an article with invalid 
     title: `Это невалидный`,
     announce: `объект`,
     fullText: `статьи`,
-    categories: [1]
+    Categories: [1]
   };
   const app = await createAPI();
 
