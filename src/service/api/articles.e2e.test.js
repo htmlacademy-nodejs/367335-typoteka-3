@@ -165,7 +165,7 @@ describe(`API returns a list of all articles`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns a list of 5 articles`, () => expect(response.body.length).toBe(5));
-  test(`First article's id equals 1`, () => expect(response.body[0].id).toBe(1));
+  test(`First article's id equals 3`, () => expect(response.body[0].id).toBe(3));
 });
 
 describe(`API returns an article with given id`, () => {
@@ -318,7 +318,10 @@ describe(`API returns a list of comments to given article`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns list of 8 comments`, () => expect(response.body.length).toBe(8));
-  test(`First comment's text is "${testComment}"`, () => expect(response.body[0].text).toBe(testComment));
+  test(`One of comments has text "${testComment}"`, () => {
+    const commentIndex = response.body.findIndex(({text}) => text === testComment);
+    expect(commentIndex).toBeGreaterThan(-1);
+  });
 });
 
 describe(`API creates a comment if data is valid`, () => {

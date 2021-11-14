@@ -80,7 +80,6 @@ const generateComments = (articlesCount, usersCount, comments) => {
       `'${getCommentText(comments, CommentsRestrict, MaxValue.COMMENT)}'`,
       `CURRENT_TIMESTAMP`,
       `CURRENT_TIMESTAMP`,
-      `CURRENT_TIMESTAMP`,
       getRandomInt(FIRST_ID, usersCount),
       articleId + 1
     ])

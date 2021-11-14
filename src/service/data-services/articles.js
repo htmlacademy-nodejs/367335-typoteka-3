@@ -32,7 +32,7 @@ class ArticlesService extends UserRelatedService {
   async findAll(comments = 0) {
     const articles = await this._Article.findAll({
       include: this._getInclude(comments),
-      // order: [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]]
+      order: [[`pubDate`, `desc`]]
     });
     return articles.map((item) => item.get());
   }
@@ -48,10 +48,11 @@ class ArticlesService extends UserRelatedService {
   }
 
   async findOne({id, comments = 0}) {
-    const article = await this._Article.findByPk(id, {
-      include: this._getInclude(comments),
-      // order: [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]]
-    });
+    const options = {include: this._getInclude(comments)};
+    if (comments) {
+      options.order = [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]];
+    }
+    const article = await this._Article.findByPk(id, options);
     if (article) {
       return article.get({plain: true});
     }
@@ -68,6 +69,10 @@ class ArticlesService extends UserRelatedService {
     const [affectedRows] = await this._Article.update(articleData, {
       where: {id}
     });
+
+    const article = await this._Article.findByPk(id);
+    await article.setCategories(articleData.Categories);
+
     return Boolean(affectedRows);
   }
 

@@ -15,7 +15,7 @@ class CommentsService extends UserRelatedService {
   findAll(ArticleId) {
     return this._Comment.findAll({
       where: {ArticleId},
-      // order: [[`createdAt`, `desc`]],
+      order: [[`createdAt`, `desc`]],
       include: [this._userInclusion],
       raw: true
     });
