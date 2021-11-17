@@ -165,7 +165,7 @@ describe(`API returns a list of all articles`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns a list of 5 articles`, () => expect(response.body.length).toBe(5));
-  test(`First article's id equals 1`, () => expect(response.body[0].id).toBe(1));
+  test(`First article's id equals 3`, () => expect(response.body[0].id).toBe(3));
 });
 
 describe(`API returns an article with given id`, () => {
@@ -232,7 +232,7 @@ describe(`API refuses to create an article if data is invalid`, () => {
   test(`When field value is wrong response code is 400`, async () => {
     const badArticles = [
       {...newArticle, title: `too short`},
-      {...newArticle, categories: []}
+      {...newArticle, Categories: []}
     ];
     for (const badArticle of badArticles) {
       await request(app)
@@ -267,7 +267,7 @@ test(`API returns status code 404 when trying to change non-existent article`, a
     fullText: `валидной статьи (длина текста не менее 30 символов)`,
     pubDate: `2020-09-21 15:59:06`,
     picture: `passed-name.jpg`,
-    categories: [1]
+    Categories: [1]
   };
   const app = await createAPI();
 
@@ -279,7 +279,7 @@ test(`API returns status code 400 when trying to change an article with invalid 
     title: `Это невалидный`,
     announce: `объект`,
     fullText: `статьи`,
-    categories: [1]
+    Categories: [1]
   };
   const app = await createAPI();
 
@@ -318,7 +318,10 @@ describe(`API returns a list of comments to given article`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(StatusCodes.OK));
   test(`Returns list of 8 comments`, () => expect(response.body.length).toBe(8));
-  test(`First comment's text is "${testComment}"`, () => expect(response.body[0].text).toBe(testComment));
+  test(`One of comments has text "${testComment}"`, () => {
+    const commentIndex = response.body.findIndex(({text}) => text === testComment);
+    expect(commentIndex).toBeGreaterThan(-1);
+  });
 });
 
 describe(`API creates a comment if data is valid`, () => {

@@ -1,7 +1,7 @@
 'use strict';
 
 const {MaxValue} = require(`../../constants`);
-const {setChar, setVarchar} = require(`./common`);
+const {setVarchar} = require(`./common`);
 
 const define = (sequelize) => sequelize.define(`User`, {
   firstName: {
@@ -18,7 +18,7 @@ const define = (sequelize) => sequelize.define(`User`, {
     unique: true
   },
   passwordHash: {
-    type: setChar(MaxValue.PASSWORD),
+    type: setVarchar(MaxValue.PASSWORD),
     allowNull: false
   },
   avatar: {

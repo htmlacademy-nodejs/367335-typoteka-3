@@ -78,10 +78,19 @@ const shuffle = (array) => {
  */
 const ensureArray = (value) => Array.isArray(value) ? value : [value];
 
+/**
+* Возвращает содержимое объекта в виде строки, закодированное для передачи в URL
+*
+* @param {Object} [payload={}]
+* @return {String}
+*/
+const getUrlJson = (payload = {}) => encodeURIComponent(JSON.stringify(payload));
+
 module.exports = {
   ensureArray,
   capitalize,
   getRandomInt,
+  getUrlJson,
   outputRes,
   writeFileToArray,
   shuffle

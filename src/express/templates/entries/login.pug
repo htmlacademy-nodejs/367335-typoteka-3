@@ -5,17 +5,15 @@ block main
     h1.visually-hidden Регистрация пользователя
     section
       .popup.popup--registration.popup--anti
-        button.popup__button.button.button--popup-close(type=`button`, aria-label=`Закрыть окно`)
-          | Закрыть окно
         h2.popup__title Войти
         .popup__form.form.form--log-in
           form(action=`/login`, method=`POST`)
             .form__field
               label
-                input(name=`email`, type=`email`, placeholder=`Электронная почта`, required=``)
+                input(name=`email`, type=`email`, maxlength=MaxValue.EMAIL, placeholder=`Электронная почта`, required=``, value=payload.email)
             .form__field
               label
-                input(name=`password`, type=`password`, placeholder=`Пароль`, required=``)
+                input(name=`password`, type=`password`, minlength=MinValue.PASSWORD, maxlength=MaxValue.PASSWORD, placeholder=`Пароль`, required=``)
             +errorMessage(errors)
             button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type=`submit`) Войти
 

@@ -5,8 +5,6 @@ block main
     h1.visually-hidden Регистрация пользователя
     section
       .popup.popup--registration.popup--anti
-        button.popup__button.button.button--popup-close(type=`button`, aria-label=`Закрыть окно`)
-          | Закрыть окно
         h2.popup__title Регистрация
         .popup__form.popup__form--active.form.form--register
           form(action=`/register`, method=`POST`, enctype=`multipart/form-data`, autocomplete=`off`)

@@ -24,7 +24,7 @@ block main
             h3 #{article.title}
             each paragraph in article.fullTextParts
               p #{paragraph}
-      .post__wrapper.post__wrapper--comments
+      .post__wrapper.post__wrapper--comments#comments
         section.post__comments.comments
           if article.Comments.length
             h2.comments__title.title.title--middle Комментарии
@@ -32,22 +32,32 @@ block main
               each comment in article.Comments
                 li.comments__comment
                   .comments__avatar.avatar
-                    img(src=`/img/avatar-1.png`, alt=`аватар пользователя`)
+                    img(src=`/img/${comment.Users.avatar}`, alt=`аватар пользователя`)
                   .comments__text
                     .comments__head
-                      p Евгений Петров •
+                      p #{comment.Users.firstName} #{comment.Users.lastName} •
                       time.comments__date(datetime=comment.date) #{comment.outputDate}
                     p.comments__message #{comment.text}
           else
             h2.comments__title.title.title--middle Комментарии отсутствуют
-          .comments__footer.comments__footer--user
-            form(action=`/articles/${article.id}`, method=`POST`)
-              .comments__avatar.avatar
-                img(src=`/img/avatar-2.png`, alt=`аватар пользователя`)
-              label
-                textarea(name=`text`, rows=`1`, placeholder=`Присоединиться к обсуждению`, minlength=MinValue.COMMENT, maxlength=MaxValue.COMMENT, required=``) #{payload.text}
-              button.comments__button.button.button--colored(type=`submit`) Опубликовать
-            +errorMessage(errors.text)
+
+          if user
+            .comments__footer.comments__footer--user
+              form(action=`/articles/${article.id}`, method=`POST`)
+                .comments__avatar.avatar
+                  img(src=`/img/${user.avatar}`, alt=`аватар пользователя`)
+                label
+                  textarea(name=`text`, rows=`1`, placeholder=`Присоединиться к обсуждению`, minlength=MinValue.COMMENT, maxlength=MaxValue.COMMENT, required=``) #{payload.text}
+                input(name=`_csrf`, type=`hidden`, value=csrfToken)
+                button.comments__button.button.button--colored(type=`submit`) Опубликовать
+              +errorMessage(errors)
+          else
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href=`/register`) Войти
+              .comments__registration
+                p.text.text--signature
+                  b.title.title--small Регистрация
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться
 
 block scripts
   script(src=`/js/main.js`)
