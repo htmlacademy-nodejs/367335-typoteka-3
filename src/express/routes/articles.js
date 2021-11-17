@@ -21,21 +21,23 @@ articlesRouter.get(`/category/:id`, (req, res) => {
 });
 
 articlesRouter.get(`/add`, [
-  auth,
+  auth(),
   csrfProtection
 ], renderPostForm);
+
 articlesRouter.get(`/edit/:id`, [
-  auth,
+  auth(),
   csrfProtection
 ], renderPostForm);
 
 articlesRouter.post(`/add`, [
-  auth,
+  auth(),
   upload.single(`picture`),
   csrfProtection
 ], sendArticle);
+
 articlesRouter.post(`/edit/:id`, [
-  auth,
+  auth(),
   upload.single(`picture`),
   csrfProtection
 ], sendArticle);
@@ -61,7 +63,7 @@ articlesRouter.get(`/:id`, csrfProtection, async (req, res, next) => {
 
 // Со страницы публикации постятся комментарии
 articlesRouter.post(`/:id`, [
-  auth,
+  auth(),
   csrfProtection
 ], async (req, res) => {
   const {user} = req.session;

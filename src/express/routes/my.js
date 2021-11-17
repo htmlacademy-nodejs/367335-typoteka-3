@@ -7,7 +7,7 @@ const auth = require(`../middlewares/auth`);
 const myRouter = new Router();
 const api = require(`../api`).getAPI();
 
-myRouter.get(`/`, auth, async (req, res) => {
+myRouter.get(`/`, auth(), async (req, res) => {
   const {user} = req.session;
   const articles = await api.getArticles();
 
@@ -17,7 +17,7 @@ myRouter.get(`/`, auth, async (req, res) => {
   });
 });
 
-myRouter.get(`/comments`, auth, async (req, res) => {
+myRouter.get(`/comments`, auth(), async (req, res) => {
   const {user} = req.session;
   const articles = await api.getArticles({comments: 1});
 
