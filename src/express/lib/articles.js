@@ -3,7 +3,8 @@
 // Набор общих функций для работы с публикациями
 
 const {StatusCodes} = require(`http-status-codes`);
-const {ensureArray, getUrlJson} = require(`../../utils`);
+const {ARTICLES_PER_PAGE} = require(`../../constants`);
+const {ensureArray, getUrlJson, getUrlError} = require(`../../utils`);
 const api = require(`../api`).getAPI();
 const dayjs = require(`dayjs`);
 
@@ -27,9 +28,7 @@ const modifyArticle = (article, query = ``) => {
     article.Comments.forEach((comment) => setDates(comment));
   }
 
-  if (article.fullText) {
-    article.fullTextParts = article.fullText.split(`\n`);
-  }
+  article.fullTextParts = `${article.announce}\n${article.fullText}`.split(`\n`);
 
   if (query) {
     article.title = article.title.replace(query, `<b>${query}</b>`);
@@ -37,20 +36,6 @@ const modifyArticle = (article, query = ``) => {
 
   return article;
 };
-
-// Получение "плоского" списка комментариев из списка статей
-const getCommentsList = (articles) => articles.reduce((acc, article) => {
-  article.Comments.forEach((comment) => {
-    setDates(comment);
-
-    acc.push({
-      ...comment,
-      articleId: article.id,
-      articleTitle: article.title
-    });
-  });
-  return acc;
-}, []);
 
 // Отправляет объявление и предзаполняет доп. данные для форм из адресной строки
 const sendArticle = async (req, res) => {
@@ -77,8 +62,7 @@ const sendArticle = async (req, res) => {
       res.status(StatusCodes.CREATED).redirect(`/my`);
     }
   } catch (err) {
-    const errorText = err.response ? err.response.data : err.message;
-    res.redirect(`${context}?payload=${getUrlJson(data)}&errors=${getUrlJson(errorText)}`);
+    res.redirect(`${context}?payload=${getUrlJson(data)}${getUrlError(err)}`);
   }
 };
 
@@ -98,15 +82,38 @@ const renderPostForm = async (req, res) => {
   res.render(`post-form`, {
     article: modifyArticle(article),
     categories,
-    errors: JSON.parse(errors),
+    errors: Object.values(JSON.parse(errors)),
     user,
     csrfToken: req.csrfToken()
   });
 };
 
+const getRouteData = async (req, CategoryId = null) => {
+  let {page = 1} = req.query;
+  page = Number(page);
+
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+  const {user} = req.session;
+
+  const [{count, articles}, categories] = await Promise.all([
+    api.getArticles({offset, limit, comments: 1, CategoryId}),
+    api.getCategories(1)
+  ]);
+
+  return {
+    articles: articles.map(modifyArticle),
+    categories,
+    page,
+    totalPages: Math.ceil(count / limit),
+    user
+  };
+};
+
 module.exports = {
-  getCommentsList,
   modifyArticle,
   renderPostForm,
-  sendArticle
+  setDates,
+  sendArticle,
+  getRouteData
 };

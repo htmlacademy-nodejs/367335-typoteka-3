@@ -16,7 +16,7 @@ module.exports = (service) => async ({params, query}, res, next) => {
   const id = params[targetParamName];
 
   const item = await service.findOne({
-    id,
+    id: Number(id),
     comments: Number(params.comments || query.comments)
   });
 

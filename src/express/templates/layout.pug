@@ -1,4 +1,6 @@
 block constants
+  - registerLinkClass = `header__registration`;
+  - loginLinkClass = `header__enter`;
 
 mixin pagination(page, totalPages, width, prefix, mixClass=null)
   -
@@ -26,18 +28,16 @@ mixin pagination(page, totalPages, width, prefix, mixClass=null)
     li
       a.pagination__button.button.button--forward(class={'button--disabled': page === totalPages}, href=(page < totalPages ? `${prefix}page=${page + 1}` : null), aria-label='Страница вперед')
 
-mixin errorMessage(error = ``, heading = ``)
-    if typeof error === `string` && error
-      p.form__error-message #{error}
-    else
-      - const errors = Object.values(error)
-      if errors.length
-        .form__validation-error
-          if heading
-            p.form__error-message #{heading}
-          ul.form__errors
-            each item in errors
-              li.form__error #{item}
+mixin errorMessage(list = [], text = ``)
+  if !list && text
+    p.form__error-message #{text}
+  else if list && list.length
+    .form__validation-error
+      if text
+        p.form__error-message #{text}
+      ul.form__errors
+        each error in list
+          li.form__error #{error}
 
 doctype html
 html(lang=`ru`)
@@ -51,30 +51,15 @@ html(lang=`ru`)
     link(rel=`preload`, href=`/fonts/SFProDisplay-Regular.woff2`, as=`font`, crossorigin=`anonymous`)
     link(rel=`stylesheet`, href=`/css/style.min.css`)
 
-    //- css overrides
-    style.
-      a:not([href]) {
-        cursor: default;
-      }
-
-      .preview__breadcrumbs {
-        flex-wrap: wrap;
-      }
-
-      .preview__item {
-        overflow: hidden; /* FF avoid breaking inside */
-      }
-
-      .header__navigation {
-        box-shadow: 0 0 15px #dddddd;
-      }
+  include partials/styles
 
   body
     div(class=bodyClass||`wrapper`)
       header(class=headerClass||`header`)
-        a.header__logo.logo(href=`/`)
-          img.logo__image(src=`/img/icons/logo-image-only.svg`, alt=`логотип Тайпотеки`)
-          span.logo__name Типотека
+        block logo
+          a.header__logo.logo(href=`/`)
+            img.logo__image(src=`/img/icons/logo-image-only.svg`, alt=`логотип Тайпотеки`)
+            span.logo__name Типотека
         if user
           if user.isAdmin
             include partials/nav-author
@@ -86,7 +71,7 @@ html(lang=`ru`)
       block main
       if !noFooter
         footer.footer
-          a.footer__copyright(href=`#!`, aria-label=`HTMLAcademy`)
+          a.footer__copyright(href=`https://htmlacademy.ru/intensive/nodejs`, aria-label=`HTMLAcademy`)
             img(src=`/img/icons/HTMLAcademyLogo.svg`, alt=`HTMLAcademy`, width=`112`, height=`50`)
           span.footer__dot
           p.footer__text Типотека, 2019

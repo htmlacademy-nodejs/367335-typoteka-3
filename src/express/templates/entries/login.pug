@@ -1,5 +1,8 @@
 extends ../layout
 
+block constants
+  - loginLinkClass = `header__popup`;
+
 block main
   main
     h1.visually-hidden Регистрация пользователя
@@ -14,7 +17,7 @@ block main
             .form__field
               label
                 input(name=`password`, type=`password`, minlength=MinValue.PASSWORD, maxlength=MaxValue.PASSWORD, placeholder=`Пароль`, required=``)
-            +errorMessage(errors)
+            +errorMessage(null, errors[0])
             button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type=`submit`) Войти
 
 block scripts

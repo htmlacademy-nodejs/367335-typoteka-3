@@ -20,34 +20,12 @@ class API {
     return data;
   }
 
-  getArticles({offset, limit, comments} = {}) {
-    return this._load(`/articles`, {params: {offset, limit, comments}});
+  getArticles({isPopular, offset, limit, comments, CategoryId} = {}) {
+    return this._load(`/articles`, {params: {isPopular, offset, limit, comments, CategoryId}});
   }
 
   getArticle({id, comments = 0}) {
     return this._load(`/articles/${id}`, {params: {comments}});
-  }
-
-  search(query = ``) {
-    return this._load(`/search`, {params: {query}});
-  }
-
-  getCategories(count = false) {
-    return this._load(`/categories`, {params: {count}});
-  }
-
-  auth(email, password) {
-    return this._load(`/user/auth`, {
-      method: HttpMethod.POST,
-      data: {email, password}
-    });
-  }
-
-  createUser(data) {
-    return this._load(`/user`, {
-      method: HttpMethod.POST,
-      data
-    });
   }
 
   createArticle(data) {
@@ -64,8 +42,66 @@ class API {
     });
   }
 
+  dropArticle(id) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  getCategories(count = 0) {
+    return this._load(`/categories`, {params: {count}});
+  }
+
+  createCategory(title) {
+    return this._load(`/categories`, {
+      method: HttpMethod.POST,
+      data: {title}
+    });
+  }
+
+  updateCategory(id, title) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.PUT,
+      data: {title}
+    });
+  }
+
+  dropCategory(id) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  getComments({isPopular, limit} = {}) {
+    return this._load(`/comments`, {params: {isPopular, limit}});
+  }
+
   createComment(id, data) {
     return this._load(`/articles/${id}/comments`, {
+      method: HttpMethod.POST,
+      data
+    });
+  }
+
+  dropComment(articleId, commentId) {
+    return this._load(`/articles/${articleId}/comments/${commentId}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  search(query = ``) {
+    return this._load(`/search`, {params: {query}});
+  }
+
+  auth(email, password) {
+    return this._load(`/user/auth`, {
+      method: HttpMethod.POST,
+      data: {email, password}
+    });
+  }
+
+  createUser(data) {
+    return this._load(`/user`, {
       method: HttpMethod.POST,
       data
     });

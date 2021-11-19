@@ -11,11 +11,13 @@ module.exports = (app, articlesService, commentsService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const {offset = 0, limit = 0, comments = 0} = req.query;
+    const {isPopular = false, offset = 0, limit = 0, comments = 0, CategoryId = null} = req.query;
 
     let articles;
-    if (limit || offset) {
-      articles = await articlesService.findPage({offset, limit, comments});
+    if (isPopular) {
+      articles = await articlesService.findPopular();
+    } else if (limit || offset) {
+      articles = await articlesService.findPage({offset, limit, comments, CategoryId});
     } else {
       articles = await articlesService.findAll(comments);
     }
@@ -29,14 +31,14 @@ module.exports = (app, articlesService, commentsService) => {
   });
 
   route.get(`/:articleId`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService)
   ], (req, res) => {
     res.status(StatusCodes.OK).json(res.locals.article);
   });
 
   route.put(`/:articleId`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService),
     schemaValidator(schema.article)
   ], async (req, res) => {
@@ -45,7 +47,7 @@ module.exports = (app, articlesService, commentsService) => {
   });
 
   route.delete(`/:articleId`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService)
   ], async (req, res) => {
     const deletedArticle = await articlesService.drop(req.params.articleId);
@@ -53,16 +55,16 @@ module.exports = (app, articlesService, commentsService) => {
   });
 
   route.get(`/:articleId/comments`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService)
   ], async (req, res) => {
     const {articleId} = req.params;
-    const comments = await commentsService.findAll(articleId);
+    const comments = await commentsService.findAll({articleId});
     res.status(StatusCodes.OK).json(comments);
   });
 
   route.post(`/:articleId/comments`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService),
     schemaValidator(schema.comment)
   ], async (req, res) => {
@@ -72,7 +74,7 @@ module.exports = (app, articlesService, commentsService) => {
   });
 
   route.delete(`/:articleId/comments/:commentId`, [
-    schemaValidator(schema.routeParams, true),
+    schemaValidator(schema.articleRouteParams, true),
     itemExistsChecker(articlesService),
     itemExistsChecker(commentsService)
   ], async (req, res) => {
