@@ -5,15 +5,6 @@
 
 ---
 
-## Памятка
-
-### Запуск для разработки (nodemon)
-
-* В одном терминале - `npm run server` - API
-* В другом терминале - `npm run dev` - SSR
-
----
-
 <a href="https://htmlacademy.ru/intensive/nodejs"><img width="50" height="50" title="HTML Academy" src="https://up.htmlacademy.ru/static/img/intensive/ecmascript/logo-for-github.svg"></a>
 
 Репозиторий создан для обучения на интенсивном онлайн‑курсе «[Node.js, уровень 1](https://htmlacademy.ru/intensive/nodejs)» от [HTML Academy](https://htmlacademy.ru).

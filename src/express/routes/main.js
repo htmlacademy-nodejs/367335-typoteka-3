@@ -32,7 +32,7 @@ mainRouter.get(`/`, async (req, res) => {
   });
 });
 
-mainRouter.get(`/categories`, auth, async (req, res) => {
+mainRouter.get(`/categories`, auth(), async (req, res) => {
   const {user} = req.session;
   const categories = await api.getCategories();
   res.render(`all-categories`, {categories, user});
