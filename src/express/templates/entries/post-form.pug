@@ -34,7 +34,6 @@ block main
                     label
                       input.visually-hidden(name=`picture`, type=`file`)
                       | Обзор
-                  button.button.button--transparent(type=`button`) Удалить
                   //- Отправляем имя загруженной картинки, которое переиспользуется, если не выбрана новая
                   input(type=`hidden`, name=`pictureUploaded`, value=article.picture)
                 .new-publication__category-wrapper
@@ -42,7 +41,7 @@ block main
                     .new-publication__checkbox.new-publication__checkbox--auto
                       input(id=`checkbox-${i}`, name=`Categories[]`, value=category.id type=`checkbox`, checked=article.Categories.includes(category.id))
                       label(for=`checkbox-${i}`) #{category.title}
-                  a.new-publication__form-link.button.button--transparent(href=`#`) Добавить категорию
+                  a.new-publication__form-link.button.button--transparent(href=`/categories`) Добавить категорию
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label

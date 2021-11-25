@@ -7,6 +7,7 @@ block main
   main.main-page.main-page--padding
     section.main-page__publication.publication
       h1.publication__title Комментарии
+      +errorMessage(errors, `При удалении комментария ${affectedId} произошли ошибки:`)
       ul.publication__list
         each comment in comments
           li.publication__list-item
@@ -14,8 +15,13 @@ block main
               img.publication__list-image(src=`/img/${comment.Users.avatar}`, alt=`Аватар пользователя`, width=`20`, height=`20`)
               b.publication__list-name #{comment.Users.firstName} #{comment.Users.lastName}
               time.publication__item-time(comment.date) #{comment.outputDate}
-            a.publication__item-text(href=`/articles/${comment.articleId}`) #{comment.text}
-            p.publication__text-strong #{comment.articleTitle}
-            button.publication__button.button.button--close-item(type=`button`)
-              span.visually-hidden Закрыть строку списка
+            a.publication__item-text(href=`/articles/${comment.ArticleId}`) #{comment.text}
+            p.publication__text-strong
+              a(href=`/articles/${comment.ArticleId}`) #{comment.Article.title}
+            form(action=`/my/comments`, method=`POST`)
+              input(name=`articleId`, type=`hidden`, value=comment.ArticleId)
+              input(name=`commentId`, type=`hidden`, value=comment.id)
+              input(name=`_csrf`, type=`hidden`, value=csrfToken)
+              button.publication__button.button.button--close-item(type=`submit`)
+                span.visually-hidden Удалить комментарий
 

@@ -1,15 +1,21 @@
 'use strict';
 
-const {Aliase: {CATEGORIES, COMMENTS}} = require(`../models/common`);
+const {POPULARS_COUNT} = require(`../../constants`);
+const truncate = require(`../lib/truncate`);
+const {Aliase: {CATEGORIES, COMMENTS, ARTICLE_CATEGORIES}} = require(`../models/common`);
 const UserRelatedService = require(`./user-related`);
 
 class ArticlesService extends UserRelatedService {
-  constructor({models}) {
-    super({models});
+  constructor(sequelize) {
+    super(sequelize);
 
+    const {models} = sequelize;
     this._Article = models.Article;
     this._Comment = models.Comment;
     this._Category = models.Category;
+    this._ArticleCategory = models.ArticleCategory;
+
+    this._sequelize = sequelize;
     this.entityName = `article`;
 
     this._commentInclusion = {
@@ -19,8 +25,30 @@ class ArticlesService extends UserRelatedService {
     };
   }
 
-  _getInclude(comments) {
-    const include = [CATEGORIES, this._userInclusion];
+  _getInclude(comments, countCategories = false) {
+    const include = [
+      {
+        model: this._Category,
+        as: CATEGORIES,
+        attributes: [
+          `id`,
+          `title`
+        ]
+      },
+      this._userInclusion
+    ];
+
+    if (countCategories) {
+      include[0].attributes.push([
+        this._sequelize.fn(`COUNT`, this._sequelize.col(`Article.id`)),
+        `count`
+      ]);
+      include[0].include = [{
+        model: this._ArticleCategory,
+        as: ARTICLE_CATEGORIES,
+        attributes: []
+      }];
+    }
 
     if (Number(comments)) {
       include.push(this._commentInclusion);
@@ -37,21 +65,86 @@ class ArticlesService extends UserRelatedService {
     return articles.map((item) => item.get());
   }
 
-  async findPage({limit = 0, offset = 0, comments = 0}) {
-    const {count, rows} = await this._Article.findAndCountAll({
+  async findPopular() {
+    const options = {
+      subQuery: false,
+      attributes: {
+        include: [
+          [this._sequelize.fn(`COUNT`, this._sequelize.col(`Comments.id`)), `commentsCount`]
+        ]
+      },
+      include: [{
+        model: this._Comment,
+        as: COMMENTS,
+        attributes: []
+      }],
+      group: [
+        this._sequelize.col(`Article.id`)
+      ],
+      order: [
+        [this._sequelize.fn(`COUNT`, this._sequelize.col(`Comments.id`)), `desc`]
+      ],
+      limit: POPULARS_COUNT
+    };
+
+    const articles = await this._Article.findAll(options);
+
+    return articles
+      .map((item) => {
+        const article = item.get();
+        article.truncatedText = truncate(article.announce);
+        return article;
+      })
+      .filter((item) => item.commentsCount);
+  }
+
+  async findPage({limit = 0, offset = 0, comments = 0, CategoryId = null}) {
+    const options = {
       limit,
       offset,
       include: this._getInclude(comments),
-      distinct: true
-    });
+      distinct: true,
+      order: [
+        [`pubDate`, `desc`],
+        [{model: this._Category, as: CATEGORIES}, `title`, `asc`]
+      ]
+    };
+    if (CategoryId) {
+      options.include.push({
+        model: this._ArticleCategory,
+        as: ARTICLE_CATEGORIES,
+        attributes: [],
+        where: {
+          CategoryId
+        }
+      });
+    }
+
+    const {count, rows} = await this._Article.findAndCountAll(options);
     return {count, articles: rows};
   }
 
   async findOne({id, comments = 0}) {
-    const options = {include: this._getInclude(comments)};
+    const options = {
+      subQuery: false,
+      include: this._getInclude(comments, true),
+      group: [
+        this._sequelize.col(`Article.id`),
+        this._sequelize.col(`Categories.id`),
+        this._sequelize.col(`Categories->ArticleCategory.createdAt`),
+        this._sequelize.col(`Categories->ArticleCategory.updatedAt`),
+        this._sequelize.col(`Categories->ArticleCategory.ArticleId`),
+        this._sequelize.col(`Categories->ArticleCategory.CategoryId`),
+        this._sequelize.col(`Users.id`)
+      ],
+      order: [[{model: this._Category, as: CATEGORIES}, `title`, `asc`]]
+    };
+
     if (comments) {
-      options.order = [[{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]];
+      options.group.push(this._sequelize.col(`Comments.id`), this._sequelize.col(`Comments->Users.id`));
+      options.order.push([{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]);
     }
+
     const article = await this._Article.findByPk(id, options);
     if (article) {
       return article.get({plain: true});

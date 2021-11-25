@@ -5,6 +5,7 @@ module.exports = {
   FIRST_ID: 1,
   ARTICLES_PER_PAGE: 8,
   USERNAME_PATTERN: `^[А-ЯА-яЁёA-Za-z]{1,100}$`,
+  POPULARS_COUNT: 4,
   Env: {
     DEVELOPMENT: `development`,
     PRODUCTION: `production`
@@ -41,6 +42,7 @@ module.exports = {
     TITLE: 30,
     ANNOUNCE: 30,
     TEXT: 30,
+    CATEGORY: 5,
     COMMENT: 20,
     PASSWORD: 6,
     SUM: 100

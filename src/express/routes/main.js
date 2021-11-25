@@ -1,41 +1,68 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {modifyArticle} = require(`../lib/articles`);
-const {ARTICLES_PER_PAGE} = require(`../../constants`);
-const {getUrlJson} = require(`../../utils`);
+const {StatusCodes} = require(`http-status-codes`);
+const csrfProtection = require(`csurf`)({cookie: true});
+const {modifyArticle, getRouteData} = require(`../lib/articles`);
+const {getUrlJson, getUrlError} = require(`../../utils`);
 const auth = require(`../middlewares/auth`);
 const upload = require(`../middlewares/upload`);
-
-const mainRouter = new Router();
 const api = require(`../api`).getAPI();
 
+const mainRouter = new Router();
+
 mainRouter.get(`/`, async (req, res) => {
-  let {page = 1} = req.query;
-  page = Number(page);
-
-  const limit = ARTICLES_PER_PAGE;
-  const offset = (page - 1) * ARTICLES_PER_PAGE;
-  const {user} = req.session;
-
-  const [{count, articles}, categories] = await Promise.all([
-    api.getArticles({offset, limit, comments: 1}),
-    api.getCategories(true)
+  const [data, populars, lastComments] = await Promise.all([
+    getRouteData(req),
+    api.getArticles({isPopular: true}),
+    api.getComments({isPopular: true})
   ]);
 
   res.render(`main`, {
-    articles: articles.map(modifyArticle),
-    categories,
-    page,
-    totalPages: Math.ceil(count / limit),
-    user
+    ...data,
+    populars,
+    lastComments
   });
 });
 
-mainRouter.get(`/categories`, auth(), async (req, res) => {
+mainRouter.get(`/categories`, [auth(), csrfProtection], async (req, res) => {
   const {user} = req.session;
+  const {id, errors = `{}`, payload = `{}`} = req.query;
   const categories = await api.getCategories();
-  res.render(`all-categories`, {categories, user});
+
+  res.render(`categories`, {
+    categories,
+    user,
+    errors: JSON.parse(errors),
+    affectedId: Number(id),
+    affectedTitle: JSON.parse(payload).title,
+    csrfToken: req.csrfToken()
+  });
+});
+
+mainRouter.post(`/categories`, [auth(), csrfProtection], async (req, res) => {
+  const {body} = req;
+  const {id = 0, title, drop = false} = body;
+  const successStatus = id ? StatusCodes.OK : StatusCodes.CREATED;
+
+  delete body._csrf;
+
+  try {
+    if (drop) {
+      const {message = null} = await api.dropCategory(id);
+      if (message) {
+        res.redirect(`/categories?id=${id}${getUrlError({message})}`);
+      }
+    } else if (id) {
+      await api.updateCategory(id, title);
+    } else {
+      await api.createCategory(title);
+    }
+
+    res.status(successStatus).redirect(`/categories`);
+  } catch (err) {
+    res.redirect(`/categories?id=${id}${!id ? `&payload=${getUrlJson({title})}` : ``}${getUrlError(err)}`);
+  }
 });
 
 mainRouter.get(`/search`, async (req, res) => {
@@ -54,12 +81,12 @@ mainRouter.get(`/search`, async (req, res) => {
   }
 });
 
-mainRouter.get(`/login`, (req, res) => {
+mainRouter.get(`/login`, csrfProtection, (req, res) => {
   const {payload = `{}`, errors = `{}`} = req.query;
 
   res.render(`login`, {
     payload: JSON.parse(payload),
-    errors: JSON.parse(errors)
+    errors: Object.values(JSON.parse(errors))
   });
 });
 
@@ -71,8 +98,7 @@ mainRouter.post(`/login`, async (req, res) => {
     req.session.user = user;
     req.session.save(() => res.redirect(`/`));
   } catch (err) {
-    const errorText = err.response ? err.response.data : err.message;
-    res.redirect(`/login?payload=${getUrlJson({email})}&errors=${getUrlJson(errorText)}`);
+    res.redirect(`/login?payload=${getUrlJson({email})}${getUrlError(err)}`);
   }
 });
 
@@ -87,7 +113,7 @@ mainRouter.get(`/register`, (req, res) => {
 
   res.render(`sign-up`, {
     payload: JSON.parse(payload),
-    errors: JSON.parse(errors),
+    errors: Object.values(JSON.parse(errors)),
     user
   });
 });
@@ -104,8 +130,7 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
     await api.createUser(userData);
     res.redirect(`/login`);
   } catch (err) {
-    const errorText = err.response ? err.response.data : err.message;
-    res.redirect(`/register?payload=${getUrlJson(userData)}&errors=${getUrlJson(errorText)}`);
+    res.redirect(`/register?payload=${getUrlJson(userData)}${getUrlError(err)}`);
   }
 });
 

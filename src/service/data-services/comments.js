@@ -1,5 +1,8 @@
 'use strict';
 
+const {POPULARS_COUNT} = require(`../../constants`);
+const truncate = require(`../lib/truncate`);
+const {Aliase: {ARTICLE}} = require(`../models/common`);
 const UserRelatedService = require(`./user-related`);
 
 class CommentsService extends UserRelatedService {
@@ -8,25 +11,48 @@ class CommentsService extends UserRelatedService {
 
     this.entityName = `comment`;
     this.parentEntityName = `article`;
-    this._Article = models.Article;
     this._Comment = models.Comment;
+    this._Article = models.Article;
   }
 
-  findAll(ArticleId) {
-    return this._Comment.findAll({
-      where: {ArticleId},
-      order: [[`createdAt`, `desc`]],
+  async findAll({articleId = null, limit = null} = {}) {
+    const options = {
       include: [this._userInclusion],
-      raw: true
+      order: [[`createdAt`, `desc`]]
+    };
+
+    if (articleId) {
+      options.where = {ArticleId: articleId};
+    }
+
+    if (limit) {
+      options.limit = limit;
+    } else {
+      options.include.push({
+        model: this._Article,
+        as: ARTICLE,
+        attributes: [`title`]
+      });
+    }
+
+    return await this._Comment.findAll(options);
+  }
+
+  async findPopular() {
+    const comments = await this.findAll({limit: POPULARS_COUNT});
+    return comments.map((item) => {
+      const comment = item.get();
+      comment.truncatedText = truncate(comment.text);
+      return comment;
     });
   }
 
-  findOne({id}) {
-    return this._Comment.findByPk(id);
+  async findOne({id}) {
+    return await this._Comment.findByPk(id);
   }
 
-  create(ArticleId, comment) {
-    return this._Comment.create({
+  async create(ArticleId, comment) {
+    return await this._Comment.create({
       ArticleId,
       ...comment
     });

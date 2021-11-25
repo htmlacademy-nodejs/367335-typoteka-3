@@ -86,11 +86,24 @@ const ensureArray = (value) => Array.isArray(value) ? value : [value];
 */
 const getUrlJson = (payload = {}) => encodeURIComponent(JSON.stringify(payload));
 
+/**
+ * Возвращает строку с массивом ошибок запроса в виде get-параметра
+ *
+ * @param {Object} err
+ * @return {String}
+ */
+const getUrlError = ({response = {}, message = ``} = {}) => {
+  const errorData = Object.values(response.data || {message}).filter(Boolean);
+
+  return errorData.length ? `&errors=${getUrlJson(errorData)}` : ``;
+};
+
 module.exports = {
   ensureArray,
   capitalize,
   getRandomInt,
   getUrlJson,
+  getUrlError,
   outputRes,
   writeFileToArray,
   shuffle

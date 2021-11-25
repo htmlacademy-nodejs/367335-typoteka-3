@@ -1,0 +1,29 @@
+extends ../layout
+
+block constants
+  - const bodyClass = `wrapper wrapper--nobackground`;
+
+block main
+  main.main-page.main-page--padding
+    section.main-page__category.category
+      h1.category__title Категории
+      +errorMessage(errors, `При ${affectedId ? `изменении категории ${affectedId}` : `добавлении категории`} произошли ошибки:`)
+      .category__add-form
+        form(action=`/categories`, method=`POST`)
+          input(name=`_csrf`, type=`hidden`, value=csrfToken)
+          input#add-form-add-category(type=`text`, name=`title`, minlength=MinValue.CATEGORY, maxlength=MaxValue.CATEGORY, placeholder=`Новая категория`, value=affectedTitle, required)
+          label(for=`add-form-add-category`)
+            span.visually-hidden Добавить категорию
+          button.category__button.button.button--category(type=`submit`) Добавить
+      if categories.length
+        ul.category__list
+          each category, i in categories
+            li.category__list-item(class=(i === categories.length - 1 ? `category__list-item--last` : ``))
+              form(action=`/categories`, method=`POST`)
+                input(name=`_csrf`, type=`hidden`, value=csrfToken)
+                input(name=`id`, type=`hidden`, value=category.id)
+                input(id=`modify-form-category-${i}`, type=`text`, name=`title`, maxlength=MaxValue.CATEGORY, value=category.title, required)
+                label(for=`modify-form-category-${i}`)
+                  span.visually-hidden Редактировать категорию
+                button.category__button.button.button--category(type=`submit`) Сохранить
+                button.category__button.button.button--category(name=`drop`, value=`1`, type=`submit`) Удалить

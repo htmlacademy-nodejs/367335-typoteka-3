@@ -8,20 +8,19 @@ block main
         h2.visually-hidden Основное содержание
         .post__wrapper
           .post__head
-            a.post__backwards.button.button--backwards(href=`#!`) Назад
+            a.post__backwards.button.button--backwards(href=backUrl) Назад
             time.post__date(datetime=article.date) #{article.outputDate}
             h2.post__title.title.title--main #{article.title}
             ul.post__themes.themes
               each category in article.Categories
                 li.themes__item
-                  a.themes__item-link(href=`#!`) #{category.title}
-                    sup 88
-                  button.themes__remove-btn(type=`button`) Удалить категорию
+                  a.themes__item-link(href=`/articles/category/${category.id}`)
+                    | #{category.title}
+                    sup #{category.count}
           if article.picture
             .post__picture
               img(src=`/img/${article.picture}`, alt=article.title)
           .post__text
-            h3 #{article.title}
             each paragraph in article.fullTextParts
               p #{paragraph}
       .post__wrapper.post__wrapper--comments#comments
@@ -50,13 +49,14 @@ block main
                   textarea(name=`text`, rows=`1`, placeholder=`Присоединиться к обсуждению`, minlength=MinValue.COMMENT, maxlength=MaxValue.COMMENT, required=``) #{payload.text}
                 input(name=`_csrf`, type=`hidden`, value=csrfToken)
                 button.comments__button.button.button--colored(type=`submit`) Опубликовать
-              +errorMessage(errors)
+              if (errors[0])
+                p.comments__error #{errors[0]}
           else
             .comments__footer.comments__footer--visitor
-              a.comments__button.button.button--colored(href=`/register`) Войти
+              a.comments__button.button.button--colored(href=`/login`) Войти
               .comments__registration
                 p.text.text--signature
-                  b.title.title--small Регистрация
+                  a.title.title--small(href=`/register`) Регистрация
                   | Чтобы присоединиться к переписке нужно зарегистрироваться
 
 block scripts
