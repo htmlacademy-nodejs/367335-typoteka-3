@@ -8,6 +8,24 @@ const schema = require(`../schema`);
 
 module.exports = (app, articlesService, commentsService) => {
   const route = new Router();
+
+  const emitPopular = async (req) => {
+    const {socketio = null} = req.app.locals;
+
+    if (!socketio) {
+      // В тестовой среде сокетов нет
+      return;
+    }
+
+    const [popularArticles, lastComments] = await Promise.all([
+      articlesService.findPopular(),
+      commentsService.findPopular()
+    ]);
+
+    socketio.emit(`update:popularArticles`, popularArticles);
+    socketio.emit(`update:lastComments`, lastComments);
+  };
+
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
@@ -51,6 +69,7 @@ module.exports = (app, articlesService, commentsService) => {
     itemExistsChecker(articlesService)
   ], async (req, res) => {
     const deletedArticle = await articlesService.drop(req.params.articleId);
+    emitPopular(req);
     res.status(StatusCodes.OK).json(deletedArticle);
   });
 
@@ -70,6 +89,7 @@ module.exports = (app, articlesService, commentsService) => {
   ], async (req, res) => {
     const {articleId} = req.params;
     const comment = await commentsService.create(articleId, req.body);
+    emitPopular(req);
     res.status(StatusCodes.CREATED).json(comment);
   });
 
@@ -80,6 +100,7 @@ module.exports = (app, articlesService, commentsService) => {
   ], async (req, res) => {
     const {commentId} = req.params;
     const deleted = await commentsService.drop(commentId);
+    emitPopular(req);
     res.status(StatusCodes.OK).json(deleted);
   });
 };

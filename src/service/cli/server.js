@@ -3,12 +3,19 @@
 const {StatusCodes, ReasonPhrases} = require(`http-status-codes`);
 const {DEFAULT_API_PORT, ExitCode} = require(`../../constants`);
 const express = require(`express`);
+const http = require(`http`);
 const routes = require(`../api`);
 const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
+const socket = require(`../lib/socket`);
 
 const logger = getLogger({name: `api`});
 const app = express();
+
+const server = http.createServer(app);
+const io = socket(server);
+app.locals.socketio = io;
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -44,7 +51,7 @@ module.exports = {
     const port = Number.parseInt(customPort, 10) || DEFAULT_API_PORT;
 
     try {
-      app.listen(port, (err) => {
+      server.listen(port, (err) => {
         if (err) {
           return logger.error(`Error in creating server: ${err.message}`);
         }

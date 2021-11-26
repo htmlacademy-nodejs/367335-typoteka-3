@@ -42,7 +42,7 @@ block main
 
           if user
             .comments__footer.comments__footer--user
-              form(action=`/articles/${article.id}`, method=`POST`)
+              form(action=`/articles/${article.id}#comments`, method=`POST`)
                 .comments__avatar.avatar
                   img(src=`/img/${user.avatar}`, alt=`аватар пользователя`)
                 label
