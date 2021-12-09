@@ -8,9 +8,9 @@ module.exports = (schema, checkParams = false, abortEarly = false) => {
       await schema.validateAsync(checkParams ? params : body, {abortEarly});
     } catch ({details = []}) {
       const errors = {};
-      for (const {context, message} of details) {
+      details.forEach(({context, message}) => {
         errors[context.key] = message;
-      }
+      });
       return res.status(StatusCodes.BAD_REQUEST).send(errors);
     }
 
