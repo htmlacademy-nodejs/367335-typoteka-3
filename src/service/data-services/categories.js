@@ -12,6 +12,21 @@ class CategoriesService {
     this.entityName = `category`;
   }
 
+  async create(title) {
+    return await this._Category.create({title});
+  }
+
+  async drop(id) {
+    const categoryWithArticles = await this.findOne({id, needCount: true});
+    if (categoryWithArticles) {
+      return {message: `Нельзя удалить категорию с публикациями!`};
+    }
+
+    const deletedRows = await this._Category.destroy({where: {id}});
+
+    return Boolean(deletedRows);
+  }
+
   async findAll(needCount) {
     if (!needCount) {
       return this._Category.findAll({
@@ -50,25 +65,10 @@ class CategoriesService {
     return await this._Category.findByPk(...options);
   }
 
-  async create(title) {
-    return await this._Category.create({title});
-  }
-
   async update(id, title) {
     const [affectedRows] = await this._Category.update({title}, {where: {id}});
 
     return Boolean(affectedRows);
-  }
-
-  async drop(id) {
-    const categoryWithArticles = await this.findOne({id, needCount: true});
-    if (categoryWithArticles) {
-      return {message: `Нельзя удалить категорию с публикациями!`};
-    }
-
-    const deletedRows = await this._Category.destroy({where: {id}});
-
-    return Boolean(deletedRows);
   }
 }
 

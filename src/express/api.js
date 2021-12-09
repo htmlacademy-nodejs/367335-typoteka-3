@@ -15,17 +15,11 @@ class API {
     });
   }
 
-  async _load(url, options) {
-    const {data} = await this._http.request({url, ...options});
-    return data;
-  }
-
-  getArticles({isPopular, offset, limit, comments, CategoryId} = {}) {
-    return this._load(`/articles`, {params: {isPopular, offset, limit, comments, CategoryId}});
-  }
-
-  getArticle({id, comments = 0}) {
-    return this._load(`/articles/${id}`, {params: {comments}});
+  auth(email, password) {
+    return this._load(`/user/auth`, {
+      method: HttpMethod.POST,
+      data: {email, password}
+    });
   }
 
   createArticle(data) {
@@ -35,9 +29,23 @@ class API {
     });
   }
 
-  updateArticle(id, data) {
-    return this._load(`/articles/${id}`, {
-      method: HttpMethod.PUT,
+  createCategory(title) {
+    return this._load(`/categories`, {
+      method: HttpMethod.POST,
+      data: {title}
+    });
+  }
+
+  createComment(id, data) {
+    return this._load(`/articles/${id}/comments`, {
+      method: HttpMethod.POST,
+      data
+    });
+  }
+
+  createUser(data) {
+    return this._load(`/user`, {
+      method: HttpMethod.POST,
       data
     });
   }
@@ -48,14 +56,42 @@ class API {
     });
   }
 
+  dropCategory(id) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  dropComment(articleId, commentId) {
+    return this._load(`/articles/${articleId}/comments/${commentId}`, {
+      method: HttpMethod.DELETE
+    });
+  }
+
+  getArticle({id, comments = 0}) {
+    return this._load(`/articles/${id}`, {params: {comments}});
+  }
+
+  getArticles({isPopular, offset, limit, comments, CategoryId} = {}) {
+    return this._load(`/articles`, {params: {isPopular, offset, limit, comments, CategoryId}});
+  }
+
   getCategories(count = 0) {
     return this._load(`/categories`, {params: {count}});
   }
 
-  createCategory(title) {
-    return this._load(`/categories`, {
-      method: HttpMethod.POST,
-      data: {title}
+  getComments({isPopular, limit} = {}) {
+    return this._load(`/comments`, {params: {isPopular, limit}});
+  }
+
+  search(query = ``) {
+    return this._load(`/search`, {params: {query}});
+  }
+
+  updateArticle(id, data) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.PUT,
+      data
     });
   }
 
@@ -66,45 +102,9 @@ class API {
     });
   }
 
-  dropCategory(id) {
-    return this._load(`/categories/${id}`, {
-      method: HttpMethod.DELETE
-    });
-  }
-
-  getComments({isPopular, limit} = {}) {
-    return this._load(`/comments`, {params: {isPopular, limit}});
-  }
-
-  createComment(id, data) {
-    return this._load(`/articles/${id}/comments`, {
-      method: HttpMethod.POST,
-      data
-    });
-  }
-
-  dropComment(articleId, commentId) {
-    return this._load(`/articles/${articleId}/comments/${commentId}`, {
-      method: HttpMethod.DELETE
-    });
-  }
-
-  search(query = ``) {
-    return this._load(`/search`, {params: {query}});
-  }
-
-  auth(email, password) {
-    return this._load(`/user/auth`, {
-      method: HttpMethod.POST,
-      data: {email, password}
-    });
-  }
-
-  createUser(data) {
-    return this._load(`/user`, {
-      method: HttpMethod.POST,
-      data
-    });
+  async _load(url, options) {
+    const {data} = await this._http.request({url, ...options});
+    return data;
   }
 }
 
