@@ -1,10 +1,17 @@
 'use strict';
 
+const article = require(`./article`);
+const category = require(`./category`);
+const comment = require(`./comment`);
+const user = require(`./user`);
+const articleRouteParams = require(`./article-route-params`);
+const categoryRouteParams = require(`./category-route-params`);
+
 module.exports = {
-  article: require(`./article`),
-  category: require(`./category`),
-  comment: require(`./comment`),
-  user: require(`./user`),
-  articleRouteParams: require(`./article-route-params`),
-  categoryRouteParams: require(`./category-route-params`)
+  article,
+  category,
+  comment,
+  user,
+  articleRouteParams,
+  categoryRouteParams
 };
