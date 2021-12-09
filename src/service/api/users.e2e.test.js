@@ -60,14 +60,14 @@ describe(`API refuses to create user if data is invalid`, () => {
   });
 
   test(`Without any required property response code is 400`, async () => {
-    for (const key of Object.keys(sampleUser)) {
+    Object.keys(sampleUser).forEach(async (key) => {
       const badUserData = {...sampleUser};
       delete badUserData[key];
       await request(app)
         .post(`/user`)
         .send(badUserData)
         .expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 
   test(`When field type is wrong response code is 400`, async () => {
@@ -75,12 +75,12 @@ describe(`API refuses to create user if data is invalid`, () => {
       {...sampleUser, firstName: true},
       {...sampleUser, email: 1}
     ];
-    for (const badUserData of badUsers) {
+    badUsers.forEach(async (badUserData) => {
       await request(app)
         .post(`/user`)
         .send(badUserData)
         .expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 
   test(`When field value is wrong response code is 400`, async () => {
@@ -88,12 +88,12 @@ describe(`API refuses to create user if data is invalid`, () => {
       {...sampleUser, password: `short`, passwordRepeated: `short`},
       {...sampleUser, email: `invalid`}
     ];
-    for (const badUserData of badUsers) {
+    badUsers.forEach(async (badUserData) => {
       await request(app)
         .post(`/user`)
         .send(badUserData)
         .expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 
   test(`When password and passwordRepeated are not equal, code is 400`, async () => {

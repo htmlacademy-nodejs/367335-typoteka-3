@@ -15,6 +15,21 @@ class CommentsService extends UserRelatedService {
     this._Article = models.Article;
   }
 
+  async create(ArticleId, comment) {
+    return await this._Comment.create({
+      ArticleId,
+      ...comment
+    });
+  }
+
+  async drop(id) {
+    const deletedRows = await this._Comment.destroy({
+      where: {id}
+    });
+
+    return Boolean(deletedRows);
+  }
+
   async findAll({articleId = null, limit = null} = {}) {
     const options = {
       include: [this._userInclusion],
@@ -38,6 +53,10 @@ class CommentsService extends UserRelatedService {
     return await this._Comment.findAll(options);
   }
 
+  async findOne({id}) {
+    return await this._Comment.findByPk(id);
+  }
+
   async findPopular() {
     const comments = await this.findAll({limit: POPULARS_COUNT});
     return comments.map((item) => {
@@ -45,25 +64,6 @@ class CommentsService extends UserRelatedService {
       comment.truncatedText = truncate(comment.text);
       return comment;
     });
-  }
-
-  async findOne({id}) {
-    return await this._Comment.findByPk(id);
-  }
-
-  async create(ArticleId, comment) {
-    return await this._Comment.create({
-      ArticleId,
-      ...comment
-    });
-  }
-
-  async drop(id) {
-    const deletedRows = await this._Comment.destroy({
-      where: {id}
-    });
-
-    return Boolean(deletedRows);
   }
 }
 

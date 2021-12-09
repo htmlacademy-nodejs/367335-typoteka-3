@@ -25,36 +25,17 @@ class ArticlesService extends UserRelatedService {
     };
   }
 
-  _getInclude(comments, countCategories = false) {
-    const include = [
-      {
-        model: this._Category,
-        as: CATEGORIES,
-        attributes: [
-          `id`,
-          `title`
-        ]
-      },
-      this._userInclusion
-    ];
+  async create(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.Categories);
+    return article.get();
+  }
 
-    if (countCategories) {
-      include[0].attributes.push([
-        this._sequelize.fn(`COUNT`, this._sequelize.col(`Article.id`)),
-        `count`
-      ]);
-      include[0].include = [{
-        model: this._ArticleCategory,
-        as: ARTICLE_CATEGORIES,
-        attributes: []
-      }];
-    }
-
-    if (Number(comments)) {
-      include.push(this._commentInclusion);
-    }
-
-    return include;
+  async drop(id) {
+    const deletedRows = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRows;
   }
 
   async findAll(comments = 0) {
@@ -63,6 +44,60 @@ class ArticlesService extends UserRelatedService {
       order: [[`pubDate`, `desc`]]
     });
     return articles.map((item) => item.get());
+  }
+
+  async findOne({id, comments = 0}) {
+    const options = {
+      subQuery: false,
+      include: this._getInclude(comments, true),
+      group: [
+        this._sequelize.col(`Article.id`),
+        this._sequelize.col(`Categories.id`),
+        this._sequelize.col(`Categories->ArticleCategory.createdAt`),
+        this._sequelize.col(`Categories->ArticleCategory.updatedAt`),
+        this._sequelize.col(`Categories->ArticleCategory.ArticleId`),
+        this._sequelize.col(`Categories->ArticleCategory.CategoryId`),
+        this._sequelize.col(`Users.id`)
+      ],
+      order: [[{model: this._Category, as: CATEGORIES}, `title`, `asc`]]
+    };
+
+    if (comments) {
+      options.group.push(this._sequelize.col(`Comments.id`), this._sequelize.col(`Comments->Users.id`));
+      options.order.push([{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]);
+    }
+
+    const article = await this._Article.findByPk(id, options);
+    if (article) {
+      return article.get({plain: true});
+    }
+    return article;
+  }
+
+  async findPage({limit = 0, offset = 0, comments = 0, CategoryId = null}) {
+    const options = {
+      limit,
+      offset,
+      include: this._getInclude(comments),
+      distinct: true,
+      order: [
+        [`pubDate`, `desc`],
+        [{model: this._Category, as: CATEGORIES}, `title`, `asc`]
+      ]
+    };
+    if (CategoryId) {
+      options.include.push({
+        model: this._ArticleCategory,
+        as: ARTICLE_CATEGORIES,
+        attributes: [],
+        where: {
+          CategoryId
+        }
+      });
+    }
+
+    const {count, rows} = await this._Article.findAndCountAll(options);
+    return {count, articles: rows};
   }
 
   async findPopular() {
@@ -98,66 +133,6 @@ class ArticlesService extends UserRelatedService {
       .filter((item) => item.commentsCount);
   }
 
-  async findPage({limit = 0, offset = 0, comments = 0, CategoryId = null}) {
-    const options = {
-      limit,
-      offset,
-      include: this._getInclude(comments),
-      distinct: true,
-      order: [
-        [`pubDate`, `desc`],
-        [{model: this._Category, as: CATEGORIES}, `title`, `asc`]
-      ]
-    };
-    if (CategoryId) {
-      options.include.push({
-        model: this._ArticleCategory,
-        as: ARTICLE_CATEGORIES,
-        attributes: [],
-        where: {
-          CategoryId
-        }
-      });
-    }
-
-    const {count, rows} = await this._Article.findAndCountAll(options);
-    return {count, articles: rows};
-  }
-
-  async findOne({id, comments = 0}) {
-    const options = {
-      subQuery: false,
-      include: this._getInclude(comments, true),
-      group: [
-        this._sequelize.col(`Article.id`),
-        this._sequelize.col(`Categories.id`),
-        this._sequelize.col(`Categories->ArticleCategory.createdAt`),
-        this._sequelize.col(`Categories->ArticleCategory.updatedAt`),
-        this._sequelize.col(`Categories->ArticleCategory.ArticleId`),
-        this._sequelize.col(`Categories->ArticleCategory.CategoryId`),
-        this._sequelize.col(`Users.id`)
-      ],
-      order: [[{model: this._Category, as: CATEGORIES}, `title`, `asc`]]
-    };
-
-    if (comments) {
-      options.group.push(this._sequelize.col(`Comments.id`), this._sequelize.col(`Comments->Users.id`));
-      options.order.push([{model: this._Comment, as: COMMENTS}, `createdAt`, `desc`]);
-    }
-
-    const article = await this._Article.findByPk(id, options);
-    if (article) {
-      return article.get({plain: true});
-    }
-    return article;
-  }
-
-  async create(articleData) {
-    const article = await this._Article.create(articleData);
-    await article.addCategories(articleData.Categories);
-    return article.get();
-  }
-
   async update(id, articleData) {
     const [affectedRows] = await this._Article.update(articleData, {
       where: {id}
@@ -169,11 +144,36 @@ class ArticlesService extends UserRelatedService {
     return Boolean(affectedRows);
   }
 
-  async drop(id) {
-    const deletedRows = await this._Article.destroy({
-      where: {id}
-    });
-    return !!deletedRows;
+  _getInclude(comments, countCategories = false) {
+    const include = [
+      {
+        model: this._Category,
+        as: CATEGORIES,
+        attributes: [
+          `id`,
+          `title`
+        ]
+      },
+      this._userInclusion
+    ];
+
+    if (countCategories) {
+      include[0].attributes.push([
+        this._sequelize.fn(`COUNT`, this._sequelize.col(`Article.id`)),
+        `count`
+      ]);
+      include[0].include = [{
+        model: this._ArticleCategory,
+        as: ARTICLE_CATEGORIES,
+        attributes: []
+      }];
+    }
+
+    if (Number(comments)) {
+      include.push(this._commentInclusion);
+    }
+
+    return include;
   }
 }
 

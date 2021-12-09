@@ -208,11 +208,11 @@ describe(`API refuses to create an article if data is invalid`, () => {
   });
 
   test(`Without any required property response code is 400`, async () => {
-    for (const key of sampleKeys) {
+    sampleKeys.forEach(async (key) => {
       const badArticle = {...newArticle};
       delete badArticle[key];
       await request(app).post(`/articles`).send(badArticle).expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 
   test(`When field type is wrong response code is 400`, async () => {
@@ -221,12 +221,12 @@ describe(`API refuses to create an article if data is invalid`, () => {
       {...newArticle, title: 12345},
       {...newArticle, categories: `Котики`}
     ];
-    for (const badArticle of badArticles) {
+    badArticles.forEach(async (badArticle) => {
       await request(app)
         .post(`/articles`)
         .send(badArticle)
         .expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 
   test(`When field value is wrong response code is 400`, async () => {
@@ -234,12 +234,12 @@ describe(`API refuses to create an article if data is invalid`, () => {
       {...newArticle, title: `too short`},
       {...newArticle, Categories: []}
     ];
-    for (const badArticle of badArticles) {
+    badArticles.forEach(async (badArticle) => {
       await request(app)
         .post(`/articles`)
         .send(badArticle)
         .expect(StatusCodes.BAD_REQUEST);
-    }
+    });
   });
 });
 

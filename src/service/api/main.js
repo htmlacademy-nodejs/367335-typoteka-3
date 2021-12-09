@@ -7,7 +7,7 @@ const categories = require(`./categories`);
 const search = require(`./search`);
 const users = require(`./users`);
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
+const defineModels = require(`../models/main`);
 const {
   ArticlesService,
   CommentsService,

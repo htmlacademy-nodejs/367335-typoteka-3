@@ -31,7 +31,7 @@ myRouter.post(`/`, [auth(), csrfProtection], async (req, res) => {
     await api.dropArticle(id);
     res.redirect(`/my`);
   } catch (err) {
-    res.redirect(`/my?id=${id}${getUrlError(err)}`);
+    res.redirect(`/my?id=${id + getUrlError(err)}`);
   }
 });
 
@@ -60,7 +60,7 @@ myRouter.post(`/comments`, [auth(), csrfProtection], async (req, res) => {
     await api.dropComment(articleId, commentId);
     res.redirect(`/my/comments`);
   } catch (err) {
-    res.redirect(`/my/comments?id=${commentId}${getUrlError(err)}`);
+    res.redirect(`/my/comments?id=${commentId + getUrlError(err)}`);
   }
 });
 
