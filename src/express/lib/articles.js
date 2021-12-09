@@ -62,7 +62,7 @@ const sendArticle = async (req, res) => {
       res.status(StatusCodes.CREATED).redirect(`/my`);
     }
   } catch (err) {
-    res.redirect(`${context}?payload=${getUrlJson(data)}${getUrlError(err)}`);
+    res.redirect(`${context}?payload=${getUrlJson(data) + getUrlError(err)}`);
   }
 };
 

@@ -51,7 +51,7 @@ mainRouter.post(`/categories`, [auth(), csrfProtection], async (req, res) => {
     if (drop) {
       const {message = null} = await api.dropCategory(id);
       if (message) {
-        res.redirect(`/categories?id=${id}${getUrlError({message})}`);
+        res.redirect(`/categories?id=${id + getUrlError({message})}`);
       }
     } else if (id) {
       await api.updateCategory(id, title);
@@ -61,7 +61,7 @@ mainRouter.post(`/categories`, [auth(), csrfProtection], async (req, res) => {
 
     res.status(successStatus).redirect(`/categories`);
   } catch (err) {
-    res.redirect(`/categories?id=${id}${!id ? `&payload=${getUrlJson({title})}` : ``}${getUrlError(err)}`);
+    res.redirect(`/categories?id=${id + (id ? `` : `&payload=${getUrlJson({title})}`) + getUrlError(err)}`);
   }
 });
 
@@ -98,7 +98,7 @@ mainRouter.post(`/login`, async (req, res) => {
     req.session.user = user;
     req.session.save(() => res.redirect(`/`));
   } catch (err) {
-    res.redirect(`/login?payload=${getUrlJson({email})}${getUrlError(err)}`);
+    res.redirect(`/login?payload=${getUrlJson({email}) + getUrlError(err)}`);
   }
 });
 
@@ -130,7 +130,7 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
     await api.createUser(userData);
     res.redirect(`/login`);
   } catch (err) {
-    res.redirect(`/register?payload=${getUrlJson(userData)}${getUrlError(err)}`);
+    res.redirect(`/register?payload=${getUrlJson(userData) + getUrlError(err)}`);
   }
 });
 

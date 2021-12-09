@@ -76,7 +76,7 @@ articlesRouter.post(`/:id`, [auth(), csrfProtection], async (req, res) => {
     });
     res.status(StatusCodes.CREATED).redirect(`/articles/${id}`);
   } catch (err) {
-    res.redirect(`/articles/${id}?payload=${getUrlJson(body)}${getUrlError(err)}`);
+    res.redirect(`/articles/${id}?payload=${getUrlJson(body) + getUrlError(err)}`);
   }
 });
 
